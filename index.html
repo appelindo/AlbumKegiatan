@@ -380,7 +380,7 @@ h1 span{color:#b8860b}
   var geser=0, vel=0, seret=false, xAwal=0, geserAwal=0, gerak=0, diam=0, mulai=performance.now(), jeda=false;
   var kecilGerak=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function bungkusRel(r){ while(r<=-N/2)r+=N; while(r>N/2)r-=N; return r; }
-  function jarak(){ return Math.min(218, Math.max(132, window.innerWidth*0.20)); }
+  function jarak(){ var lk=(window.innerWidth<=700?168:208); var s=Math.min(218, Math.max(132, window.innerWidth*0.20)); return Math.max(s, lk+10); } /* v13: langkah antar kartu minimal selebar kartu + 10px supaya di HP kartu tidak saling menumpuk */
   var teksFokus=document.getElementById('teksFokus');
   function gambar(sekarang){
     var bukaAmt = kecilGerak ? 1 : Math.min(1, Math.max(0, (sekarang-mulai)/1100));
