@@ -100,7 +100,7 @@ h1 span{color:#b8860b}
   </div>
 </header>
 <main>
-<p class="contoh"><strong>Versi 7: gerak album lebih pelan, transisi foto halus ala iPhone, dan tombol Upload Kegiatan.</strong> Album pertama sekarang ASLI: <strong>Rapat Koordinasi Persiapan Tahun 2027</strong> dengan 4 foto yang dikirim Selby, tertanam langsung di berkas ini. Di dalam album, foto tampil satu besar dan berganti satu per satu (tombol, gambar kecil, panah keyboard, atau putar otomatis). Album lain masih contoh dummy.</p>
+<p class="contoh"><strong>Versi 8: bisa upload VIDEO dan album bisa DIEDIT pemiliknya dengan kode edit.</strong> Album pertama sekarang ASLI: <strong>Rapat Koordinasi Persiapan Tahun 2027</strong> dengan 4 foto yang dikirim Selby, tertanam langsung di berkas ini. Di dalam album, foto tampil satu besar dan berganti satu per satu (tombol, gambar kecil, panah keyboard, atau putar otomatis). Album lain masih contoh dummy.</p>
 <h1>Album Pelatihan<br><span>Sejajar Lurus</span></h1>
 <p class="sub">Geser albumnya: semua kartu berbaris lurus satu garis. Klik kartu untuk membukanya, lalu lihat fotonya satu per satu, satu foto besar setiap kali.</p>
 
@@ -135,6 +135,7 @@ h1 span{color:#b8860b}
     </div>
     <div class="nav">
       <button type="button" id="btnAlbumSebelum">Album sebelumnya</button>
+      <button type="button" id="btnEditAlbum" style="display:none;background:#f5b921;color:#0a1f3c;border-color:#0a1f3c">Edit Album</button>
       <button type="button" id="btnAlbumSesudah">Album berikutnya</button>
     </div>
   </div>
@@ -144,7 +145,12 @@ h1 span{color:#b8860b}
   <div class="detail">
     <button type="button" class="tutup" id="btnTutupUpload" aria-label="Tutup unggah">×</button>
     <h2 id="uJudul" style="font-size:24px;line-height:1.2;padding-right:52px">Upload Kegiatan</h2>
-    <p class="info">Isi keterangan kegiatannya, pilih foto-fotonya (maksimal 6), lalu tekan Kirim. Album langsung tampil di halaman ini untuk semua pengunjung. Foto otomatis diperkecil dulu supaya cepat terkirim.</p>
+    <p class="info">Isi keterangan kegiatannya, pilih foto atau videonya (maksimal 6 berkas), lalu tekan Kirim. Album langsung tampil di halaman ini untuk semua pengunjung. Foto otomatis diperkecil dulu supaya cepat terkirim; video dikirim apa adanya, maksimal 25 MB per video (MP4 paling aman). Sesudah terbit kamu menerima <strong>kode edit</strong>: simpan baik-baik, kode itu kunci untuk mengedit atau menghapus albummu nanti.</p>
+    <div id="uKodeKotak" style="display:none;margin-top:14px;background:#0a1f3c;color:#fff;border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.1em;opacity:.85">ALBUMMU SUDAH TERBIT. KODE EDIT KAMU:</div>
+      <div id="uKodeTeks" style="font-size:30px;font-weight:900;letter-spacing:.18em;color:#f5b921;margin-top:6px"></div>
+      <div style="font-size:12px;margin-top:6px;opacity:.9">Foto atau catat kode ini sekarang. Tanpa kode ini album tidak bisa diedit.</div>
+    </div>
     <div style="display:grid;gap:10px;margin-top:14px">
       <label style="font-weight:800;font-size:13px">Nama kegiatan *
         <input id="uNama" type="text" maxlength="80" placeholder="mis. Pelatihan Teknik Investigasi Angkatan IV" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
@@ -165,6 +171,41 @@ h1 span{color:#b8860b}
     <div class="nav">
       <button type="button" id="btnBatalUpload">Batal</button>
       <button type="button" id="btnKirimUpload" style="background:#0a1f3c;color:#fff">Kirim dan Terbitkan</button>
+    </div>
+  </div>
+</div>
+
+<div class="lapis" id="lapisEdit" role="dialog" aria-modal="true" aria-labelledby="eJudul">
+  <div class="detail">
+    <button type="button" class="tutup" id="btnTutupEdit" aria-label="Tutup edit">×</button>
+    <h2 id="eJudul" style="font-size:24px;line-height:1.2;padding-right:52px">Edit Album</h2>
+    <p class="info">Masukkan kode edit yang kamu terima saat album diterbitkan. Tanpa kode yang benar, perubahan tidak akan disimpan.</p>
+    <div style="display:grid;gap:10px;margin-top:14px">
+      <label style="font-weight:800;font-size:13px">Kode edit *
+        <input id="eKode" type="text" maxlength="12" placeholder="mis. K7P2QX" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:700;letter-spacing:.12em;text-transform:uppercase">
+      </label>
+      <label style="font-weight:800;font-size:13px">Nama kegiatan
+        <input id="eNama" type="text" maxlength="80" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
+      </label>
+      <label style="font-weight:800;font-size:13px">Tanggal / keterangan waktu
+        <input id="eTanggal" type="text" maxlength="60" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
+      </label>
+      <label style="font-weight:800;font-size:13px">Jenis kegiatan
+        <input id="eJenis" type="text" maxlength="60" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
+      </label>
+      <label style="font-weight:800;font-size:13px">Cerita singkat kegiatan
+        <textarea id="eRingkas" rows="3" maxlength="600" style="display:block;width:100%;margin-top:5px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400"></textarea>
+      </label>
+    </div>
+    <p style="font-weight:800;font-size:13px;margin-top:16px">Foto dan video yang sekarang tayang</p>
+    <div id="eMediaDaftar" style="display:grid;gap:10px;margin-top:8px"></div>
+    <p style="font-weight:800;font-size:13px;margin-top:16px">Tambah foto / video baru</p>
+    <div id="eBaruDaftar" style="display:grid;gap:10px;margin-top:8px"></div>
+    <button type="button" id="btnTambahMediaEdit" style="margin-top:10px;border:1.5px dashed #0a1f3c;background:#fff;color:#0a1f3c;border-radius:999px;padding:10px 16px;font-weight:800;font-size:13px;min-height:44px">Tambah berkas</button>
+    <p id="eStatus" style="font-size:13px;font-weight:700;color:#445065;margin-top:12px" aria-live="polite"></p>
+    <div class="nav">
+      <button type="button" id="btnHapusAlbum" style="border-color:#b3261e;color:#b3261e">Hapus Album</button>
+      <button type="button" id="btnSimpanEdit" style="background:#0a1f3c;color:#fff">Simpan Perubahan</button>
     </div>
   </div>
 </div>
@@ -274,6 +315,12 @@ h1 span{color:#b8860b}
     var s=document.createElement('div'); s.className='slide-foto';
     if(typeof f==='string'){
       var d=document.createElement('div'); d.className='kerangka g'+(i+1); d.textContent=f; s.appendChild(d);
+    } else if(f.video){
+      var fr=document.createElement('iframe'); fr.src=f.putar; fr.title=f.ket||'Video kegiatan';
+      fr.setAttribute('allow','autoplay; encrypted-media; fullscreen'); fr.setAttribute('allowfullscreen','');
+      fr.style.cssText='width:100%;height:100%;border:0;display:block;background:#000';
+      s.appendChild(fr);
+      var lv=document.createElement('div'); lv.className='label-foto'; lv.textContent='VIDEO, '+(f.ket||''); s.appendChild(lv);
     } else {
       var img=document.createElement('img'); img.src=f.src; img.alt=f.ket; s.appendChild(img);
       var lb=document.createElement('div'); lb.className='label-foto'; lb.textContent=f.ket; s.appendChild(lb);
@@ -285,7 +332,7 @@ h1 span{color:#b8860b}
     var lama=panggungFoto.querySelector('.slide-foto');
     var baru=buatSlide(f,fotoIdx);
     function indikator(){
-      hitungFoto.textContent='Foto '+(fotoIdx+1)+' dari '+a.foto.length;
+      hitungFoto.textContent=(f&&f.video?'Video ':'Foto ')+(fotoIdx+1)+' dari '+a.foto.length;
       Array.prototype.forEach.call(jajaranKecil.children,function(b,i){b.classList.toggle('aktif',i===fotoIdx)});
     }
     if(kecilGerak||arah===0||!lama){
@@ -306,7 +353,11 @@ h1 span{color:#b8860b}
     indikator();
   }
   function langkahFoto(arah){var n=DATA[aktif].foto.length; fotoIdx=(fotoIdx+arah+n)%n; gambarFoto(arah); if(putarFoto)mulaiPutar()}
-  function mulaiPutar(){clearInterval(timerFoto); timerFoto=setInterval(function(){langkahFoto(1)},3000)}
+  function mulaiPutar(){clearInterval(timerFoto); timerFoto=setInterval(function(){
+    var f=DATA[aktif]&&DATA[aktif].foto[fotoIdx];
+    if(f&&f.video)return; /* video sedang tampil: jangan diganti otomatis */
+    langkahFoto(1);
+  },3000)}
   function hentiPutar(){putarFoto=false; clearInterval(timerFoto); btnPutarFoto.textContent='Putar otomatis'; btnPutarFoto.classList.remove('aktif-putar')}
   btnPutarFoto.addEventListener('click',function(){
     if(putarFoto){hentiPutar()} else {putarFoto=true; btnPutarFoto.textContent='Hentikan putaran'; btnPutarFoto.classList.add('aktif-putar'); mulaiPutar()}
@@ -319,12 +370,14 @@ h1 span{color:#b8860b}
     document.getElementById('dJudul').textContent=a.nama;
     document.getElementById('dRingkas').textContent=a.ringkas;
     document.getElementById('dMeta').innerHTML='Tanggal: '+a.tgl+'<br>Jenis: '+a.jenis;
+    document.getElementById('btnEditAlbum').style.display=a.dariUnggahan?'':'none';
     fotoIdx=0; hentiPutar();
     jajaranKecil.innerHTML='';
     a.foto.forEach(function(f,i){
       var b=document.createElement('button'); b.type='button'; b.setAttribute('aria-label','Lihat foto '+(i+1)+': '+ketFoto(f));
       if(typeof f==='string'){var m=document.createElement('div'); m.className='mini g'+(i+1); m.textContent=(i+1); b.appendChild(m)}
-      else {var im=document.createElement('img'); im.src=f.src; im.alt=''; b.appendChild(im)}
+      else {var im=document.createElement('img'); im.src=f.src; im.alt=''; b.appendChild(im);
+        if(f.video){var lencana=document.createElement('span'); lencana.textContent='VIDEO'; lencana.style.cssText='position:absolute;left:4px;bottom:4px;background:rgba(10,31,60,.85);color:#fff;font-size:9px;font-weight:900;letter-spacing:.08em;padding:2px 6px;border-radius:99px'; b.style.position='relative'; b.appendChild(lencana)}}
       b.addEventListener('click',function(){var arah=i>fotoIdx?1:-1; fotoIdx=i; gambarFoto(arah); if(putarFoto)mulaiPutar()});
       jajaranKecil.appendChild(b);
     });
@@ -390,7 +443,7 @@ h1 span{color:#b8860b}
     if(uFotoDaftar.children.length>=6)return;
     var r=document.createElement('div');
     r.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
-    r.innerHTML='<input type="file" accept="image/*" style="flex:1;min-width:190px;min-height:44px;padding:8px;border:1.5px solid #c9cfda;border-radius:10px;background:#fff"><input type="text" maxlength="120" placeholder="Keterangan foto" style="flex:1;min-width:150px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit">';
+    r.innerHTML='<input type="file" accept="image/*,video/*" style="flex:1;min-width:190px;min-height:44px;padding:8px;border:1.5px solid #c9cfda;border-radius:10px;background:#fff"><input type="text" maxlength="120" placeholder="Keterangan foto / video" style="flex:1;min-width:150px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit">';
     uFotoDaftar.appendChild(r);
   }
   tambahBarisFoto(); tambahBarisFoto();
@@ -416,26 +469,46 @@ h1 span{color:#b8860b}
       img.src=url;
     });
   }
+  var MAKS_VIDEO=25*1024*1024;
+  function prosesMedia(file){
+    if(file.type.indexOf('video/')===0){
+      if(file.size>MAKS_VIDEO)return Promise.reject(new Error('Video "'+file.name+'" melebihi 25 MB'));
+      return new Promise(function(res,rej){
+        var r=new FileReader();
+        r.onload=function(){res({data:String(r.result).split(',')[1], video:true, mime:file.type})};
+        r.onerror=function(){rej(new Error('video tidak terbaca'))};
+        r.readAsDataURL(file);
+      });
+    }
+    return prosesFoto(file).then(function(data){return {data:data}});
+  }
+  function kodeAcak(){
+    var ab='ABCDEFGHJKMNPQRSTUVWXYZ23456789', s='';
+    for(var i=0;i<6;i++)s+=ab[Math.floor(Math.random()*ab.length)];
+    return s;
+  }
   var btnKirim=document.getElementById('btnKirimUpload');
   btnKirim.addEventListener('click',function(){
     var nama=document.getElementById('uNama').value.trim();
     var tanggal=document.getElementById('uTanggal').value.trim();
     if(!nama||!tanggal){uStatus.textContent='Nama kegiatan dan tanggal wajib diisi.'; return}
     var baris=Array.prototype.slice.call(uFotoDaftar.children).filter(function(r){return r.querySelector('input[type=file]').files.length});
-    if(!baris.length){uStatus.textContent='Pilih minimal satu foto dulu.'; return}
-    btnKirim.disabled=true; uStatus.textContent='Memproses foto...';
+    if(!baris.length){uStatus.textContent='Pilih minimal satu foto atau video dulu.'; return}
+    btnKirim.disabled=true; uStatus.textContent='Memproses foto dan video...';
+    var kodeBaru=kodeAcak();
     var janji=baris.map(function(r){
-      return prosesFoto(r.querySelector('input[type=file]').files[0]).then(function(data){
-        return {data:data, ket:r.querySelector('input[type=text]').value.trim()};
+      return prosesMedia(r.querySelector('input[type=file]').files[0]).then(function(m){
+        m.ket=r.querySelector('input[type=text]').value.trim(); return m;
       });
     });
-    Promise.all(janji).then(function(fotos){
+    Promise.all(janji).then(function(media){
       uStatus.textContent='Mengirim ke server...';
       return fetch(API_ALBUM,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
         nama:nama, tanggal:tanggal,
         jenis:document.getElementById('uJenis').value.trim(),
         ringkas:document.getElementById('uRingkas').value.trim(),
-        foto:fotos
+        kode:kodeBaru,
+        media:media
       })}).then(function(){
         uStatus.textContent='Terkirim, menunggu album tampil...';
         var coba=0;
@@ -443,15 +516,121 @@ h1 span{color:#b8860b}
           coba++;
           muatDariServer().then(function(d){
             if(d&&d.ok&&d.album&&d.album.some(function(a){return a.nama===nama})){
-              gabungServer(d.album); tutupUpload(); btnKirim.disabled=false; uStatus.textContent='';
-              aktif=0; isiDetail(); lapis.classList.add('buka'); document.body.style.overflow='hidden';
-            } else if(coba<6){ setTimeout(periksa,4000); }
+              gabungServer(d.album); btnKirim.disabled=false;
+              document.getElementById('uKodeTeks').textContent=kodeBaru;
+              document.getElementById('uKodeKotak').style.display='block';
+              uStatus.textContent='Album sudah tayang sebagai album pertama. Tutup panel ini untuk melihatnya, dan jangan lupa menyimpan kode editmu.';
+            } else if(coba<8){ setTimeout(periksa,4000); }
             else { btnKirim.disabled=false; uStatus.textContent='Kirim belum terkonfirmasi tampil. Coba segarkan halaman ini beberapa saat lagi.'; }
           });
         })();
       });
     }).catch(function(err){
       btnKirim.disabled=false; uStatus.textContent='Gagal: '+err.message;
+    });
+  });
+
+  /* ===== Edit Album (v8, berkode edit) ===== */
+  var lapisEdit=document.getElementById('lapisEdit'), eStatus=document.getElementById('eStatus'),
+      eMediaDaftar=document.getElementById('eMediaDaftar'), eBaruDaftar=document.getElementById('eBaruDaftar');
+  function tutupEdit(){lapisEdit.classList.remove('buka'); if(!lapis.classList.contains('buka'))document.body.style.overflow=''}
+  document.getElementById('btnTutupEdit').addEventListener('click',tutupEdit);
+  lapisEdit.addEventListener('click',function(e){if(e.target===lapisEdit)tutupEdit()});
+  function barisMediaLama(f){
+    var r=document.createElement('div');
+    r.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap';
+    r.dataset.fid=f.fid||''; r.dataset.video=f.video?'1':'';
+    r.innerHTML='<img src="'+f.src+'" alt="" style="width:76px;height:56px;object-fit:cover;border-radius:8px">'
+      +'<input type="text" maxlength="120" value="'+(f.ket||'').replace(/"/g,'&quot;')+'" placeholder="Keterangan" style="flex:1;min-width:140px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit">'
+      +(f.video?'<span style="font-size:10px;font-weight:900;background:#0a1f3c;color:#fff;padding:3px 8px;border-radius:99px">VIDEO</span>':'')
+      +'<label style="font-size:12px;font-weight:800;color:#b3261e;display:flex;gap:5px;align-items:center;min-height:44px"><input type="checkbox" class="e-buang" style="width:20px;height:20px"> Buang</label>';
+    return r;
+  }
+  function barisMediaBaru(){
+    var r=document.createElement('div');
+    r.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
+    r.innerHTML='<input type="file" accept="image/*,video/*" style="flex:1;min-width:190px;min-height:44px;padding:8px;border:1.5px solid #c9cfda;border-radius:10px;background:#fff"><input type="text" maxlength="120" placeholder="Keterangan foto / video" style="flex:1;min-width:150px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit">';
+    return r;
+  }
+  document.getElementById('btnTambahMediaEdit').addEventListener('click',function(){
+    if(eMediaDaftar.querySelectorAll(':scope > div').length+eBaruDaftar.children.length>=10){eStatus.textContent='Jumlah berkas dibatasi.'; return}
+    eBaruDaftar.appendChild(barisMediaBaru());
+  });
+  document.getElementById('btnEditAlbum').addEventListener('click',function(){
+    var a=DATA[aktif]; if(!a||!a.dariUnggahan)return;
+    document.getElementById('eKode').value='';
+    document.getElementById('eNama').value=a.nama;
+    document.getElementById('eTanggal').value=a.tgl;
+    document.getElementById('eJenis').value=a.jenis;
+    document.getElementById('eRingkas').value=a.ringkas;
+    eStatus.textContent='';
+    eMediaDaftar.innerHTML=''; eBaruDaftar.innerHTML='';
+    a.foto.forEach(function(f){ if(typeof f!=='string') eMediaDaftar.appendChild(barisMediaLama(f)); });
+    lapisEdit.classList.add('buka'); document.body.style.overflow='hidden';
+  });
+  function kirimDanTunggu(payload, syarat){
+    return fetch(API_ALBUM,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)}).then(function(){
+      return new Promise(function(res){
+        var coba=0;
+        (function periksa(){
+          coba++;
+          muatDariServer().then(function(d){
+            if(d&&d.ok){ gabungServer(d.album); if(syarat(d.album))return res(true); }
+            if(coba<8)setTimeout(periksa,4000); else res(false);
+          });
+        })();
+      });
+    });
+  }
+  var btnSimpanEdit=document.getElementById('btnSimpanEdit');
+  btnSimpanEdit.addEventListener('click',function(){
+    var a=DATA[aktif]; if(!a)return;
+    var kode=document.getElementById('eKode').value.trim().toUpperCase();
+    if(!kode){eStatus.textContent='Kode edit wajib diisi.'; return}
+    var namaBaru=document.getElementById('eNama').value.trim();
+    if(!namaBaru){eStatus.textContent='Nama kegiatan tidak boleh kosong.'; return}
+    var media=[];
+    Array.prototype.forEach.call(eMediaDaftar.children,function(r){
+      if(r.querySelector('.e-buang').checked)return;
+      media.push({fid:r.dataset.fid, video:r.dataset.video==='1', ket:r.querySelector('input[type=text]').value.trim()});
+    });
+    var barisBaru=Array.prototype.slice.call(eBaruDaftar.children).filter(function(r){return r.querySelector('input[type=file]').files.length});
+    btnSimpanEdit.disabled=true; eStatus.textContent='Memproses dan menyimpan...';
+    Promise.all(barisBaru.map(function(r){
+      return prosesMedia(r.querySelector('input[type=file]').files[0]).then(function(m){ m.ket=r.querySelector('input[type=text]').value.trim(); return m; });
+    })).then(function(baru){
+      var semua=media.concat(baru);
+      if(!semua.length){ eStatus.textContent='Album harus punya minimal satu foto atau video.'; btnSimpanEdit.disabled=false; return; }
+      var ubahLama=a.ubah;
+      return kirimDanTunggu({aksi:'edit', id:a.id, kode:kode, nama:namaBaru,
+        tanggal:document.getElementById('eTanggal').value.trim(),
+        jenis:document.getElementById('eJenis').value.trim(),
+        ringkas:document.getElementById('eRingkas').value.trim(), media:semua},
+        function(albums){ var t=albums.filter(function(x){return x.id===a.id})[0]; return !!t&&String(t.ubah)!==String(ubahLama); }
+      ).then(function(berhasil){
+        btnSimpanEdit.disabled=false;
+        if(berhasil){
+          tutupEdit();
+          var idx=DATA.findIndex(function(x){return x.id===a.id});
+          if(idx>=0){ aktif=idx; isiDetail(); }
+          eStatus.textContent='';
+        } else {
+          eStatus.textContent='Perubahan belum terkonfirmasi. Kemungkinan kode edit salah, atau server lambat. Periksa lagi kode editmu lalu coba lagi.';
+        }
+      });
+    }).catch(function(err){ btnSimpanEdit.disabled=false; eStatus.textContent='Gagal: '+err.message; });
+  });
+  document.getElementById('btnHapusAlbum').addEventListener('click',function(){
+    var a=DATA[aktif]; if(!a)return;
+    var kode=document.getElementById('eKode').value.trim().toUpperCase();
+    if(!kode){eStatus.textContent='Isi kode edit dulu sebelum menghapus.'; return}
+    if(!window.confirm('Hapus album "'+a.nama+'" selamanya? Foto dan videonya juga dibuang.'))return;
+    eStatus.textContent='Menghapus...';
+    kirimDanTunggu({aksi:'hapus', id:a.id, kode:kode}, function(albums){
+      return !albums.some(function(x){return x.id===a.id});
+    }).then(function(berhasil){
+      if(berhasil){ tutupEdit(); tutup(); }
+      else eStatus.textContent='Album belum terhapus. Kemungkinan kode edit salah.';
     });
   });
 })();
