@@ -87,7 +87,15 @@ h1 span{color:#b8860b}
 .nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
 .nav button{border:1.5px solid #0a1f3c;background:#fff;border-radius:999px;padding:11px 18px;font-weight:800;font-size:13px;min-height:44px}
 .tutup{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:0;background:#0a1f3c;color:#fff;font-size:20px;font-weight:900}
-@media(max-width:700px){.panggung{height:440px}.kartu{width:168px;height:238px;margin-left:-84px;margin-top:-119px}.kartu .nama{font-size:20px}header{padding:16px}.contoh{margin:0 16px}.bar-foto button{flex:1}.hitung{order:-1;width:100%;text-align:center}}
+@media(max-width:700px){.panggung{height:440px}.kartu{width:168px;height:238px;margin-left:-84px;margin-top:-119px}.kartu .nama{font-size:20px}header{padding:16px}.contoh{margin:0 16px}.bar-foto button{flex:1}.hitung{order:-1;width:100%;text-align:center}
+  /* v14: tombol header & kendali di HP jadi kisi rapi selebar sama */
+  header{flex-direction:column;align-items:stretch;gap:10px;position:relative}
+  header .tahun{position:absolute;top:16px;right:16px}
+  header>div:last-child{display:grid !important;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+  #chipPengguna{grid-column:1/-1}
+  header>div:last-child button{width:100%}
+  .kendali{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kendali button{width:100%}}
 @media(prefers-reduced-motion:reduce){.detail,.detail.ganti-kiri,.detail.ganti-kanan{animation-duration:.01s}}
 
   /* ===== Halaman masuk lampu (v11) ===== */
