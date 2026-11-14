@@ -584,6 +584,8 @@ h1 span{color:#b8860b}
   segarkanTombolMasuk();
   var lapisMasuk=document.getElementById('lapisMasuk'), mStatus=document.getElementById('mStatus'), sesudahMasuk=null;
   function bukaMasuk(lanjut){ sesudahMasuk=lanjut||null; mStatus.textContent=''; lapisMasuk.classList.add('buka'); document.body.style.overflow='hidden'; }
+  /* v12: layar masuk lampu tampil otomatis saat halaman dibuka bila belum ada sesi masuk */
+  if(!SESI){ bukaMasuk(null); }
   function tutupMasuk(){ lapisMasuk.classList.remove('buka'); if(!lapis.classList.contains('buka')&&!lapisUpload.classList.contains('buka'))document.body.style.overflow=''; }
   document.getElementById('btnTutupMasuk').addEventListener('click',tutupMasuk);
   document.getElementById('btnBatalMasuk').addEventListener('click',tutupMasuk);
