@@ -9,7 +9,8 @@
   bahasa visual editorial terang identitas APPEL (navy #0a1f3c, emas #f5b921, latar krem netral).
   Model versi 4 atas permintaan Selby: album SEJAJAR LURUS, tidak melengkung, tidak miring.
   Kartu berbaris satu garis mendatar; yang di tengah paling besar, ke tepi mengecil dan meredup.
-  Dial: ENERGY 3 / RHYTHM 2 / MOTION 3. Gerak adalah isi halaman ini (geser lurus + kartu terbang),
+  Dial: ENERGY 3 / RHYTHM 2 / MOTION 3. Gerak halaman ini adalah geser lurus albumnya;
+  klik album membuka detail langsung tanpa animasi terbang (keputusan Selby 14 Nov 11:30).
   jadi MOTION 3 disengaja, dengan tombol Jeda gerak dan dukungan prefers-reduced-motion.
   Alasan keputusan (R-31):
   - Warna halaman navy/emas: identitas APPEL yang sudah disetujui Selby, bukan palet bawaan.
@@ -55,16 +56,11 @@ h1 span{color:#b8860b}
 .petunjuk{text-align:center;font-size:11px;font-weight:800;letter-spacing:.1em;color:#445065;padding-bottom:26px}
 .kosong{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);background:#fff;border:1px solid #ddd6c4;border-radius:12px;padding:20px 24px;font-size:14px;line-height:1.6;color:#445065;max-width:420px;text-align:center}
 
-/* Elemen terbang saat kartu diklik */
-.terbang{position:fixed;z-index:30;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;color:#fff;box-shadow:0 30px 70px rgba(0,0,0,.4);pointer-events:none}
-.terbang .nama{font-weight:900;font-size:28px;line-height:1.02}
-.terbang .tgl{font-size:11px;font-weight:700;letter-spacing:.1em;opacity:.95}
-
-/* Detail sesudah terbang selesai */
+/* Detail album (dibuka langsung saat kartu diklik, tanpa elemen terbang) */
 .lapis{position:fixed;inset:0;background:rgba(7,18,34,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:25}
 .lapis.buka{display:flex}
-.detail{background:#fffdf6;width:min(940px,100%);max-height:92dvh;overflow:auto;border-radius:14px;box-shadow:0 34px 80px rgba(0,0,0,.45);padding:26px;position:relative;animation:muncul .35s ease}
-@keyframes muncul{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.detail{background:#fffdf6;width:min(940px,100%);max-height:92dvh;overflow:auto;border-radius:14px;box-shadow:0 34px 80px rgba(0,0,0,.45);padding:26px;position:relative;animation:muncul .18s ease}
+@keyframes muncul{from{opacity:0}to{opacity:1}}
 .detail.ganti-kiri{animation:gantiKiri .38s ease}.detail.ganti-kanan{animation:gantiKanan .38s ease}
 @keyframes gantiKiri{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
 @keyframes gantiKanan{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}
@@ -101,7 +97,7 @@ h1 span{color:#b8860b}
   <div class="tahun">ARSIP 2026</div>
 </header>
 <main>
-<p class="contoh"><strong>Contoh versi 5, album lurus + foto tampil satu per satu.</strong> Album pertama sekarang ASLI: <strong>Rapat Koordinasi Persiapan Tahun 2027</strong> dengan 4 foto yang dikirim Selby, tertanam langsung di berkas ini. Di dalam album, foto tampil satu besar dan berganti satu per satu (tombol, gambar kecil, panah keyboard, atau putar otomatis). Album lain masih contoh dummy.</p>
+<p class="contoh"><strong>Contoh versi 6, album lurus + foto satu per satu, tanpa animasi terbang.</strong> Album pertama sekarang ASLI: <strong>Rapat Koordinasi Persiapan Tahun 2027</strong> dengan 4 foto yang dikirim Selby, tertanam langsung di berkas ini. Di dalam album, foto tampil satu besar dan berganti satu per satu (tombol, gambar kecil, panah keyboard, atau putar otomatis). Album lain masih contoh dummy.</p>
 <h1>Album Pelatihan<br><span>Sejajar Lurus</span></h1>
 <p class="sub">Geser albumnya: semua kartu berbaris lurus satu garis. Klik kartu untuk membukanya, lalu lihat fotonya satu per satu, satu foto besar setiap kali.</p>
 
@@ -227,7 +223,7 @@ h1 span{color:#b8860b}
   var btnJeda=document.getElementById('btnJeda');
   btnJeda.addEventListener('click',function(){jeda=!jeda;diam=performance.now();btnJeda.textContent=jeda?'Gerakkan lagi':'Jeda gerak'});
 
-  /* Klik: kartu terbang ke tengah dan membesar, lalu detail muncul di tempatnya */
+  /* Klik kartu: detail langsung terbuka */
   var lapis=document.getElementById('lapis'), kotak=document.getElementById('kotakDetail'), aktif=0, pemicu=null;
   /* Penampil foto: satu foto besar, tampil satu per satu */
   var fotoIdx=0, putarFoto=false, timerFoto=null;
@@ -271,25 +267,14 @@ h1 span{color:#b8860b}
     });
     gambarFoto(0);
   }
+  /* Klik membuka detail LANGSUNG, tanpa animasi kartu terbang.
+     Animasi terbang dihapus atas penilaian Selby 14 Nov 11:30: elemen terbangnya
+     menyalin latar gradasi kartu (bukan fotonya), jadi album foto asli terbang
+     sebagai kotak navy kosong raksasa, lalu berganti mendadak ke detail putih. */
   function terbangBuka(i){
     aktif=i; pemicu=document.activeElement;
-    var el=kartuEls[i], r=el.getBoundingClientRect(), a=DATA[i];
-    var terbang=document.createElement('div'); terbang.className='terbang '+a.kelas;
-    terbang.style.left=r.left+'px'; terbang.style.top=r.top+'px'; terbang.style.width=r.width+'px'; terbang.style.height=r.height+'px';
-    terbang.style.background=getComputedStyle(el).background;
-    terbang.innerHTML='<div class="tgl">'+a.tgl.toUpperCase()+'</div><div class="nama">'+a.nama+'</div>';
-    document.body.appendChild(terbang);
-    var tw=Math.min(940, window.innerWidth-36), th=Math.min(window.innerHeight*.86, 560);
-    var tx=(window.innerWidth-tw)/2, ty=(window.innerHeight-th)/2;
-    var anim=terbang.animate([
-      {left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',transform:'rotateY(14deg)',opacity:1},
-      {left:tx+'px',top:ty+'px',width:tw+'px',height:th+'px',transform:'rotateY(0deg)',opacity:1}
-    ],{duration:kecilGerak?10:560,easing:'cubic-bezier(.22,.9,.26,1)',fill:'forwards'});
-    anim.onfinish=function(){
-      isiDetail(); lapis.classList.add('buka'); document.body.style.overflow='hidden';
-      document.getElementById('btnTutup').focus();
-      setTimeout(function(){terbang.remove()},60);
-    };
+    isiDetail(); lapis.classList.add('buka'); document.body.style.overflow='hidden';
+    document.getElementById('btnTutup').focus();
   }
   function tutup(){hentiPutar();lapis.classList.remove('buka');document.body.style.overflow='';if(pemicu&&pemicu.focus)pemicu.focus()}
   function gantiAlbum(arah,kelas){
