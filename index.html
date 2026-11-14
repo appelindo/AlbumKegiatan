@@ -61,9 +61,9 @@ h1 span{color:#b8860b}
 .lapis.buka{display:flex}
 .detail{background:#fffdf6;width:min(940px,100%);max-height:92dvh;overflow:auto;border-radius:14px;box-shadow:0 34px 80px rgba(0,0,0,.45);padding:26px;position:relative;animation:muncul .18s ease}
 @keyframes muncul{from{opacity:0}to{opacity:1}}
-.detail.ganti-kiri{animation:gantiKiri .38s ease}.detail.ganti-kanan{animation:gantiKanan .38s ease}
-@keyframes gantiKiri{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:none}}
-@keyframes gantiKanan{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:none}}
+.detail.ganti-kiri{animation:gantiKiri .5s cubic-bezier(.22,1,.36,1)}.detail.ganti-kanan{animation:gantiKanan .5s cubic-bezier(.22,1,.36,1)}
+@keyframes gantiKiri{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+@keyframes gantiKanan{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
 .detail h2{font-size:28px;line-height:1.12;padding-right:52px}
 .detail .info{color:#445065;font-size:14px;line-height:1.65;margin-top:8px}
 .detail .meta{font-weight:800;font-size:13px;line-height:1.7;margin-top:10px}
@@ -72,8 +72,8 @@ h1 span{color:#b8860b}
 .panggung-foto img{width:100%;height:100%;object-fit:cover;display:block}
 .panggung-foto .kerangka{position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;color:#fff;font-weight:800;font-size:16px;line-height:1.4}
 .panggung-foto .label-foto{position:absolute;left:0;right:0;bottom:0;padding:28px 16px 12px;background:linear-gradient(transparent,rgba(0,0,0,.55));color:#fff;font-weight:700;font-size:14px;line-height:1.4}
-.panggung-foto.masuk-kanan{animation:gantiKanan .38s ease}
-.panggung-foto.masuk-kiri{animation:gantiKiri .38s ease}
+.slide-foto{position:absolute;inset:0;transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1);will-change:opacity,transform}
+.slide-foto.pergi{opacity:0;transform:scale(.99);pointer-events:none}
 .bar-foto{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;flex-wrap:wrap}
 .bar-foto button{border:1.5px solid #0a1f3c;background:#fff;color:#0a1f3c;border-radius:999px;padding:11px 18px;font-weight:800;font-size:13px;min-height:44px}
 .bar-foto button.aktif-putar{background:#0a1f3c;color:#fff}
@@ -94,10 +94,13 @@ h1 span{color:#b8860b}
 <body>
 <header>
   <div class="logo">Pusdiklat KM<small>DOKUMENTASI KEGIATAN PELATIHAN</small></div>
-  <div class="tahun">ARSIP 2026</div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <button type="button" id="btnUpload" style="background:#f5b921;color:#0a1f3c;border:0;border-radius:999px;padding:11px 20px;font-weight:900;font-size:13px;min-height:44px;cursor:pointer">Upload Kegiatan</button>
+    <div class="tahun">ARSIP 2026</div>
+  </div>
 </header>
 <main>
-<p class="contoh"><strong>Contoh versi 6, album lurus + foto satu per satu, tanpa animasi terbang.</strong> Album pertama sekarang ASLI: <strong>Rapat Koordinasi Persiapan Tahun 2027</strong> dengan 4 foto yang dikirim Selby, tertanam langsung di berkas ini. Di dalam album, foto tampil satu besar dan berganti satu per satu (tombol, gambar kecil, panah keyboard, atau putar otomatis). Album lain masih contoh dummy.</p>
+<p class="contoh"><strong>Versi 7: gerak album lebih pelan, transisi foto halus ala iPhone, dan tombol Upload Kegiatan.</strong> Album pertama sekarang ASLI: <strong>Rapat Koordinasi Persiapan Tahun 2027</strong> dengan 4 foto yang dikirim Selby, tertanam langsung di berkas ini. Di dalam album, foto tampil satu besar dan berganti satu per satu (tombol, gambar kecil, panah keyboard, atau putar otomatis). Album lain masih contoh dummy.</p>
 <h1>Album Pelatihan<br><span>Sejajar Lurus</span></h1>
 <p class="sub">Geser albumnya: semua kartu berbaris lurus satu garis. Klik kartu untuk membukanya, lalu lihat fotonya satu per satu, satu foto besar setiap kali.</p>
 
@@ -137,6 +140,35 @@ h1 span{color:#b8860b}
   </div>
 </div>
 
+<div class="lapis" id="lapisUpload" role="dialog" aria-modal="true" aria-labelledby="uJudul">
+  <div class="detail">
+    <button type="button" class="tutup" id="btnTutupUpload" aria-label="Tutup unggah">×</button>
+    <h2 id="uJudul" style="font-size:24px;line-height:1.2;padding-right:52px">Upload Kegiatan</h2>
+    <p class="info">Isi keterangan kegiatannya, pilih foto-fotonya (maksimal 6), lalu tekan Kirim. Album langsung tampil di halaman ini untuk semua pengunjung. Foto otomatis diperkecil dulu supaya cepat terkirim.</p>
+    <div style="display:grid;gap:10px;margin-top:14px">
+      <label style="font-weight:800;font-size:13px">Nama kegiatan *
+        <input id="uNama" type="text" maxlength="80" placeholder="mis. Pelatihan Teknik Investigasi Angkatan IV" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
+      </label>
+      <label style="font-weight:800;font-size:13px">Tanggal / keterangan waktu *
+        <input id="uTanggal" type="text" maxlength="60" placeholder="mis. 20 November 2026" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
+      </label>
+      <label style="font-weight:800;font-size:13px">Jenis kegiatan
+        <input id="uJenis" type="text" maxlength="60" placeholder="mis. Klasikal, 5 hari" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
+      </label>
+      <label style="font-weight:800;font-size:13px">Cerita singkat kegiatan
+        <textarea id="uRingkas" rows="3" maxlength="600" placeholder="Tujuan kegiatan, jalannya acara, dan hasilnya, singkat saja." style="display:block;width:100%;margin-top:5px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400"></textarea>
+      </label>
+    </div>
+    <div id="uFotoDaftar" style="display:grid;gap:10px;margin-top:14px"></div>
+    <button type="button" id="btnTambahFoto" style="margin-top:10px;border:1.5px dashed #0a1f3c;background:#fff;color:#0a1f3c;border-radius:999px;padding:10px 16px;font-weight:800;font-size:13px;min-height:44px">Tambah foto</button>
+    <p id="uStatus" style="font-size:13px;font-weight:700;color:#445065;margin-top:12px" aria-live="polite"></p>
+    <div class="nav">
+      <button type="button" id="btnBatalUpload">Batal</button>
+      <button type="button" id="btnKirimUpload" style="background:#0a1f3c;color:#fff">Kirim dan Terbitkan</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   var DATA=[
@@ -152,11 +184,16 @@ h1 span{color:#b8860b}
   ];
   var panggung=document.getElementById('panggung'), N=DATA.length;
   var kartuEls=[];
-  DATA.forEach(function(a,i){
-    var d=document.createElement('div'); d.className='kartu '+a.kelas; d.dataset.i=i;
-    d.innerHTML='<div class="foto">'+(a.sampul?'<img src="'+a.sampul+'" alt="Foto sampul '+a.nama+'">':'FOTO KEGIATAN')+'</div><div class="tgl">'+a.tgl.toUpperCase()+'</div><div class="nama">'+a.nama+'</div><div class="meta">'+a.jenis+'<br>Klik untuk membuka</div>';
-    panggung.appendChild(d); kartuEls.push(d);
-  });
+  function bangunKartu(){
+    kartuEls.forEach(function(el){el.remove()}); kartuEls=[];
+    DATA.forEach(function(a,i){
+      var d=document.createElement('div'); d.className='kartu '+a.kelas; d.dataset.i=i;
+      d.innerHTML='<div class="foto">'+(a.sampul?'<img src="'+a.sampul+'" alt="Foto sampul '+a.nama+'">':'FOTO KEGIATAN')+'</div><div class="tgl">'+a.tgl.toUpperCase()+'</div><div class="nama">'+a.nama+'</div><div class="meta">'+a.jenis+'<br>Klik untuk membuka</div>';
+      panggung.appendChild(d); kartuEls.push(d);
+    });
+    N=DATA.length;
+  }
+  bangunKartu();
   if(DATA.length===0){
     var kosong=document.createElement('div'); kosong.className='kosong';
     kosong.textContent='Belum ada album pelatihan yang diterbitkan. Album akan tampil di sini sesudah panitia mengunggah dokumentasi kegiatan pertama.';
@@ -195,7 +232,7 @@ h1 span{color:#b8860b}
   function putar(sekarang){
     if(!seret){
       geser+=vel; vel*=.94;
-      if(Math.abs(vel)<.0005){ vel=0; if(!kecilGerak && !jeda && performance.now()-diam>1800) geser+=.0016; }
+      if(Math.abs(vel)<.0005){ vel=0; if(!kecilGerak && !jeda && performance.now()-diam>1800) geser+=.0010; }
     }
     gambar(sekarang||performance.now());
     requestAnimationFrame(putar);
@@ -229,18 +266,44 @@ h1 span{color:#b8860b}
   var fotoIdx=0, putarFoto=false, timerFoto=null;
   var panggungFoto=document.getElementById('panggungFoto'), hitungFoto=document.getElementById('hitungFoto'), jajaranKecil=document.getElementById('jajaranKecil'), btnPutarFoto=document.getElementById('btnPutarFoto');
   function ketFoto(f){return typeof f==='string'?f:f.ket}
+  /* Transisi foto ala iPhone (perbaikan v7 atas keluhan Selby 'transisinya bergetar'):
+     foto baru memudar masuk sambil mengecil dari skala 1,045 ke 1 dengan easing
+     cubic-bezier(.22,1,.36,1), foto lama memudar keluar di tempatnya. Gambar
+     didekode dulu sebelum transisi dimulai supaya tidak ada kedipan dekode. */
+  function buatSlide(f,i){
+    var s=document.createElement('div'); s.className='slide-foto';
+    if(typeof f==='string'){
+      var d=document.createElement('div'); d.className='kerangka g'+(i+1); d.textContent=f; s.appendChild(d);
+    } else {
+      var img=document.createElement('img'); img.src=f.src; img.alt=f.ket; s.appendChild(img);
+      var lb=document.createElement('div'); lb.className='label-foto'; lb.textContent=f.ket; s.appendChild(lb);
+    }
+    return s;
+  }
   function gambarFoto(arah){
     var a=DATA[aktif], f=a.foto[fotoIdx];
-    panggungFoto.innerHTML='';
-    if(typeof f==='string'){
-      var d=document.createElement('div'); d.className='kerangka g'+(fotoIdx+1); d.textContent=f; panggungFoto.appendChild(d);
-    } else {
-      var img=document.createElement('img'); img.src=f.src; img.alt=f.ket; panggungFoto.appendChild(img);
-      var lb=document.createElement('div'); lb.className='label-foto'; lb.textContent=f.ket; panggungFoto.appendChild(lb);
+    var lama=panggungFoto.querySelector('.slide-foto');
+    var baru=buatSlide(f,fotoIdx);
+    function indikator(){
+      hitungFoto.textContent='Foto '+(fotoIdx+1)+' dari '+a.foto.length;
+      Array.prototype.forEach.call(jajaranKecil.children,function(b,i){b.classList.toggle('aktif',i===fotoIdx)});
     }
-    hitungFoto.textContent='Foto '+(fotoIdx+1)+' dari '+a.foto.length;
-    Array.prototype.forEach.call(jajaranKecil.children,function(b,i){b.classList.toggle('aktif',i===fotoIdx)});
-    if(!kecilGerak&&arah!==0){panggungFoto.classList.remove('masuk-kiri','masuk-kanan'); void panggungFoto.offsetWidth; panggungFoto.classList.add(arah>0?'masuk-kanan':'masuk-kiri')}
+    if(kecilGerak||arah===0||!lama){
+      panggungFoto.innerHTML=''; panggungFoto.appendChild(baru); indikator(); return;
+    }
+    baru.style.opacity='0';
+    baru.style.transform='scale(1.045) translateX('+(arah>0?26:-26)+'px)';
+    panggungFoto.appendChild(baru);
+    var jalankan=function(){
+      void baru.offsetWidth;
+      baru.style.opacity='1'; baru.style.transform='scale(1) translateX(0px)';
+      lama.classList.add('pergi');
+      setTimeout(function(){if(lama.parentNode)lama.remove()},720);
+    };
+    var im=baru.querySelector('img'), sudah=false;
+    var go=function(){if(!sudah){sudah=true;jalankan()}};
+    if(im&&im.decode){im.decode().then(go).catch(go); setTimeout(go,180)} else {jalankan()}
+    indikator();
   }
   function langkahFoto(arah){var n=DATA[aktif].foto.length; fotoIdx=(fotoIdx+arah+n)%n; gambarFoto(arah); if(putarFoto)mulaiPutar()}
   function mulaiPutar(){clearInterval(timerFoto); timerFoto=setInterval(function(){langkahFoto(1)},3000)}
@@ -291,6 +354,106 @@ h1 span{color:#b8860b}
   });
   document.getElementById('btnAlbumSebelum').addEventListener('click',function(){gantiAlbum(-1,'ganti-kiri')});
   document.getElementById('btnAlbumSesudah').addEventListener('click',function(){gantiAlbum(1,'ganti-kanan')});
+
+  /* ===== Upload Kegiatan + album dari server (v7) =====
+     Backend: Apps Script "Album Kegiatan API" (Sheets + Drive).
+     Daftar album dibaca lewat JSONP; unggahan dikirim POST teks biasa
+     tanpa CORS, lalu keberhasilannya dipastikan dengan membaca ulang daftarnya. */
+  var API_ALBUM='https://script.google.com/macros/s/AKfycbxwXwiFcetUBXcjhEeVbhyXoBOM886wBKX37uFFcHKlEof9gJZTCenNSgsrtwmDQV9I/exec';
+  var DATA_TETAP=DATA.slice();
+  function muatDariServer(){
+    return new Promise(function(res){
+      var selesai=false, cb='cbAlbum'+Date.now()+Math.floor(Math.random()*999);
+      var s=document.createElement('script');
+      function beres(v){if(!selesai){selesai=true; try{delete window[cb]}catch(e){} if(s.parentNode)s.remove(); res(v)}}
+      window[cb]=function(d){beres(d)};
+      s.onerror=function(){beres(null)};
+      s.src=API_ALBUM+'?callback='+cb+'&t='+Date.now();
+      document.body.appendChild(s);
+      setTimeout(function(){beres(null)},9000);
+    });
+  }
+  function gabungServer(albumServer){
+    if(!albumServer||!albumServer.length)return false;
+    albumServer.forEach(function(a,i){
+      a.kelas='w'+((i%8)+1);
+      if(a.foto&&a.foto.length)a.sampul=a.foto[0].src;
+    });
+    DATA=albumServer.concat(DATA_TETAP);
+    geser=0; bangunKartu();
+    return true;
+  }
+  muatDariServer().then(function(d){if(d&&d.ok)gabungServer(d.album)});
+
+  var lapisUpload=document.getElementById('lapisUpload'), uStatus=document.getElementById('uStatus'), uFotoDaftar=document.getElementById('uFotoDaftar');
+  function tambahBarisFoto(){
+    if(uFotoDaftar.children.length>=6)return;
+    var r=document.createElement('div');
+    r.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
+    r.innerHTML='<input type="file" accept="image/*" style="flex:1;min-width:190px;min-height:44px;padding:8px;border:1.5px solid #c9cfda;border-radius:10px;background:#fff"><input type="text" maxlength="120" placeholder="Keterangan foto" style="flex:1;min-width:150px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit">';
+    uFotoDaftar.appendChild(r);
+  }
+  tambahBarisFoto(); tambahBarisFoto();
+  document.getElementById('btnTambahFoto').addEventListener('click',tambahBarisFoto);
+  function bukaUpload(){lapisUpload.classList.add('buka'); document.body.style.overflow='hidden'; document.getElementById('uNama').focus()}
+  function tutupUpload(){lapisUpload.classList.remove('buka'); document.body.style.overflow=''}
+  document.getElementById('btnUpload').addEventListener('click',bukaUpload);
+  document.getElementById('btnTutupUpload').addEventListener('click',tutupUpload);
+  document.getElementById('btnBatalUpload').addEventListener('click',tutupUpload);
+  lapisUpload.addEventListener('click',function(e){if(e.target===lapisUpload)tutupUpload()});
+
+  function prosesFoto(file){
+    return new Promise(function(res,rej){
+      var url=URL.createObjectURL(file), img=new Image();
+      img.onload=function(){
+        var maks=1280, w=img.naturalWidth, h=img.naturalHeight, sk=Math.min(1, maks/Math.max(w,h));
+        var c=document.createElement('canvas'); c.width=Math.round(w*sk); c.height=Math.round(h*sk);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        URL.revokeObjectURL(url);
+        res(c.toDataURL('image/jpeg',0.82).split(',')[1]);
+      };
+      img.onerror=function(){URL.revokeObjectURL(url); rej(new Error('foto tidak terbaca'))};
+      img.src=url;
+    });
+  }
+  var btnKirim=document.getElementById('btnKirimUpload');
+  btnKirim.addEventListener('click',function(){
+    var nama=document.getElementById('uNama').value.trim();
+    var tanggal=document.getElementById('uTanggal').value.trim();
+    if(!nama||!tanggal){uStatus.textContent='Nama kegiatan dan tanggal wajib diisi.'; return}
+    var baris=Array.prototype.slice.call(uFotoDaftar.children).filter(function(r){return r.querySelector('input[type=file]').files.length});
+    if(!baris.length){uStatus.textContent='Pilih minimal satu foto dulu.'; return}
+    btnKirim.disabled=true; uStatus.textContent='Memproses foto...';
+    var janji=baris.map(function(r){
+      return prosesFoto(r.querySelector('input[type=file]').files[0]).then(function(data){
+        return {data:data, ket:r.querySelector('input[type=text]').value.trim()};
+      });
+    });
+    Promise.all(janji).then(function(fotos){
+      uStatus.textContent='Mengirim ke server...';
+      return fetch(API_ALBUM,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
+        nama:nama, tanggal:tanggal,
+        jenis:document.getElementById('uJenis').value.trim(),
+        ringkas:document.getElementById('uRingkas').value.trim(),
+        foto:fotos
+      })}).then(function(){
+        uStatus.textContent='Terkirim, menunggu album tampil...';
+        var coba=0;
+        (function periksa(){
+          coba++;
+          muatDariServer().then(function(d){
+            if(d&&d.ok&&d.album&&d.album.some(function(a){return a.nama===nama})){
+              gabungServer(d.album); tutupUpload(); btnKirim.disabled=false; uStatus.textContent='';
+              aktif=0; isiDetail(); lapis.classList.add('buka'); document.body.style.overflow='hidden';
+            } else if(coba<6){ setTimeout(periksa,4000); }
+            else { btnKirim.disabled=false; uStatus.textContent='Kirim belum terkonfirmasi tampil. Coba segarkan halaman ini beberapa saat lagi.'; }
+          });
+        })();
+      });
+    }).catch(function(err){
+      btnKirim.disabled=false; uStatus.textContent='Gagal: '+err.message;
+    });
+  });
 })();
 </script>
 </body>
