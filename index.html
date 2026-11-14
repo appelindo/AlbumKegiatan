@@ -95,12 +95,14 @@ h1 span{color:#b8860b}
 <header>
   <div class="logo">Pusdiklat KM<small>DOKUMENTASI KEGIATAN PELATIHAN</small></div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <span id="chipPengguna" style="display:none;font-size:13px;font-weight:800;color:#0a1f3c"></span>
+    <button type="button" id="btnMasuk" style="background:#fff;color:#0a1f3c;border:1.5px solid #0a1f3c;border-radius:999px;padding:11px 20px;font-weight:900;font-size:13px;min-height:44px;cursor:pointer">Masuk</button>
     <button type="button" id="btnUpload" style="background:#f5b921;color:#0a1f3c;border:0;border-radius:999px;padding:11px 20px;font-weight:900;font-size:13px;min-height:44px;cursor:pointer">Upload Kegiatan</button>
     <div class="tahun">ARSIP 2026</div>
   </div>
 </header>
 <main>
-<p class="contoh"><strong>Versi 8: bisa upload VIDEO dan album bisa DIEDIT pemiliknya dengan kode edit.</strong> Album pertama sekarang ASLI: <strong>Rapat Koordinasi Persiapan Tahun 2027</strong> dengan 4 foto yang dikirim Selby, tertanam langsung di berkas ini. Di dalam album, foto tampil satu besar dan berganti satu per satu (tombol, gambar kecil, panah keyboard, atau putar otomatis). Album lain masih contoh dummy.</p>
+<p class="contoh"><strong>Versi 9: masuk dengan NIP pegawai Pusdiklat KM untuk mengunggah dan mengedit album.</strong> Album pertama sekarang ASLI: <strong>Rapat Koordinasi Persiapan Tahun 2027</strong> dengan 4 foto yang dikirim Selby, tertanam langsung di berkas ini. Di dalam album, foto tampil satu besar dan berganti satu per satu (tombol, gambar kecil, panah keyboard, atau putar otomatis). Album lain masih contoh dummy.</p>
 <h1>Album Pelatihan<br><span>Sejajar Lurus</span></h1>
 <p class="sub">Geser albumnya: semua kartu berbaris lurus satu garis. Klik kartu untuk membukanya, lalu lihat fotonya satu per satu, satu foto besar setiap kali.</p>
 
@@ -145,7 +147,7 @@ h1 span{color:#b8860b}
   <div class="detail">
     <button type="button" class="tutup" id="btnTutupUpload" aria-label="Tutup unggah">×</button>
     <h2 id="uJudul" style="font-size:24px;line-height:1.2;padding-right:52px">Upload Kegiatan</h2>
-    <p class="info">Isi keterangan kegiatannya, pilih foto atau videonya (maksimal 6 berkas), lalu tekan Kirim. Album langsung tampil di halaman ini untuk semua pengunjung. Foto otomatis diperkecil dulu supaya cepat terkirim; video dikirim apa adanya, maksimal 25 MB per video (MP4 paling aman). Sesudah terbit kamu menerima <strong>kode edit</strong>: simpan baik-baik, kode itu kunci untuk mengedit atau menghapus albummu nanti.</p>
+    <p class="info">Isi keterangan kegiatannya, pilih foto atau videonya (maksimal 6 berkas), lalu tekan Kirim. Album langsung tampil di halaman ini untuk semua pengunjung. Foto otomatis diperkecil dulu supaya cepat terkirim; video dikirim apa adanya, maksimal 25 MB per video (MP4 paling aman). Berkas yang tidak memenuhi syarat akan ditandai merah: hapus dengan tombol <strong>×</strong> di barisnya atau ganti berkasnya. Karena kamu sudah masuk, album ini tercatat atas namamu dan bisa kamu edit kapan saja lewat tombol Edit Album (kode edit tetap diberikan sebagai cadangan).</p>
     <div id="uKodeKotak" style="display:none;margin-top:14px;background:#0a1f3c;color:#fff;border-radius:12px;padding:16px;text-align:center">
       <div style="font-size:12px;font-weight:800;letter-spacing:.1em;opacity:.85">ALBUMMU SUDAH TERBIT. KODE EDIT KAMU:</div>
       <div id="uKodeTeks" style="font-size:30px;font-weight:900;letter-spacing:.18em;color:#f5b921;margin-top:6px"></div>
@@ -179,7 +181,7 @@ h1 span{color:#b8860b}
   <div class="detail">
     <button type="button" class="tutup" id="btnTutupEdit" aria-label="Tutup edit">×</button>
     <h2 id="eJudul" style="font-size:24px;line-height:1.2;padding-right:52px">Edit Album</h2>
-    <p class="info">Masukkan kode edit yang kamu terima saat album diterbitkan. Tanpa kode yang benar, perubahan tidak akan disimpan.</p>
+    <p class="info">Bila kamu masuk sebagai pengunggah album ini (atau sebagai admin), kode edit boleh dikosongkan. Selain itu masukkan kode edit yang kamu terima saat album diterbitkan.</p>
     <div style="display:grid;gap:10px;margin-top:14px">
       <label style="font-weight:800;font-size:13px">Kode edit *
         <input id="eKode" type="text" maxlength="12" placeholder="mis. K7P2QX" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:700;letter-spacing:.12em;text-transform:uppercase">
@@ -206,6 +208,27 @@ h1 span{color:#b8860b}
     <div class="nav">
       <button type="button" id="btnHapusAlbum" style="border-color:#b3261e;color:#b3261e">Hapus Album</button>
       <button type="button" id="btnSimpanEdit" style="background:#0a1f3c;color:#fff">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<div class="lapis" id="lapisMasuk" role="dialog" aria-modal="true" aria-labelledby="mJudul">
+  <div class="detail" style="max-width:480px">
+    <button type="button" class="tutup" id="btnTutupMasuk" aria-label="Tutup masuk">×</button>
+    <h2 id="mJudul" style="font-size:24px;line-height:1.2;padding-right:52px">Masuk</h2>
+    <p class="info">Masuk dengan <strong>NIP pegawai Pusdiklat KM</strong> untuk mengunggah dan mengedit albummu. Kata sandi awal semua pegawai: <strong>123456</strong>.</p>
+    <div style="display:grid;gap:10px;margin-top:14px">
+      <label style="font-weight:800;font-size:13px">NIP
+        <input id="mNip" type="text" inputmode="numeric" maxlength="24" placeholder="Nomor Induk Pegawai" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
+      </label>
+      <label style="font-weight:800;font-size:13px">Kata sandi
+        <input id="mSandi" type="password" maxlength="40" placeholder="Kata sandi" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:400">
+      </label>
+    </div>
+    <p id="mStatus" style="font-size:13px;font-weight:700;color:#445065;margin-top:12px" aria-live="polite"></p>
+    <div class="nav">
+      <button type="button" id="btnBatalMasuk">Batal</button>
+      <button type="button" id="btnKirimMasuk" style="background:#0a1f3c;color:#fff">Masuk</button>
     </div>
   </div>
 </div>
@@ -369,7 +392,7 @@ h1 span{color:#b8860b}
     var a=DATA[aktif];
     document.getElementById('dJudul').textContent=a.nama;
     document.getElementById('dRingkas').textContent=a.ringkas;
-    document.getElementById('dMeta').innerHTML='Tanggal: '+a.tgl+'<br>Jenis: '+a.jenis;
+    document.getElementById('dMeta').innerHTML='Tanggal: '+a.tgl+'<br>Jenis: '+a.jenis+(a.pengunggah?'<br>Diunggah oleh: '+a.pengunggah:'');
     document.getElementById('btnEditAlbum').style.display=a.dariUnggahan?'':'none';
     fotoIdx=0; hentiPutar();
     jajaranKecil.innerHTML='';
@@ -414,18 +437,21 @@ h1 span{color:#b8860b}
      tanpa CORS, lalu keberhasilannya dipastikan dengan membaca ulang daftarnya. */
   var API_ALBUM='https://script.google.com/macros/s/AKfycbxwXwiFcetUBXcjhEeVbhyXoBOM886wBKX37uFFcHKlEof9gJZTCenNSgsrtwmDQV9I/exec';
   var DATA_TETAP=DATA.slice();
-  function muatDariServer(){
+  function jsonpAlbum(param){
     return new Promise(function(res){
       var selesai=false, cb='cbAlbum'+Date.now()+Math.floor(Math.random()*999);
       var s=document.createElement('script');
       function beres(v){if(!selesai){selesai=true; try{delete window[cb]}catch(e){} if(s.parentNode)s.remove(); res(v)}}
       window[cb]=function(d){beres(d)};
       s.onerror=function(){beres(null)};
-      s.src=API_ALBUM+'?callback='+cb+'&t='+Date.now();
+      var qs='?callback='+cb+'&t='+Date.now();
+      Object.keys(param||{}).forEach(function(k){qs+='&'+k+'='+encodeURIComponent(param[k])});
+      s.src=API_ALBUM+qs;
       document.body.appendChild(s);
-      setTimeout(function(){beres(null)},9000);
+      setTimeout(function(){beres(null)},12000);
     });
   }
+  function muatDariServer(){ return jsonpAlbum({}); }
   function gabungServer(albumServer){
     if(!albumServer||!albumServer.length)return false;
     albumServer.forEach(function(a,i){
@@ -438,19 +464,83 @@ h1 span{color:#b8860b}
   }
   muatDariServer().then(function(d){if(d&&d.ok)gabungServer(d.album)});
 
+  /* ===== Masuk pengguna (v9): NIP pegawai Pusdiklat KM ===== */
+  var SESI=null;
+  try{ var simpanan=JSON.parse(localStorage.getItem('albumSesi')||'null'); if(simpanan&&simpanan.token)SESI=simpanan; }catch(e){}
+  var btnMasukEl=document.getElementById('btnMasuk'), chipEl=document.getElementById('chipPengguna');
+  function segarkanTombolMasuk(){
+    if(SESI){ chipEl.style.display=''; chipEl.textContent='Halo, '+SESI.nama; btnMasukEl.textContent='Keluar'; }
+    else { chipEl.style.display='none'; chipEl.textContent=''; btnMasukEl.textContent='Masuk'; }
+  }
+  segarkanTombolMasuk();
+  var lapisMasuk=document.getElementById('lapisMasuk'), mStatus=document.getElementById('mStatus'), sesudahMasuk=null;
+  function bukaMasuk(lanjut){ sesudahMasuk=lanjut||null; mStatus.textContent=''; lapisMasuk.classList.add('buka'); document.body.style.overflow='hidden'; }
+  function tutupMasuk(){ lapisMasuk.classList.remove('buka'); if(!lapis.classList.contains('buka')&&!lapisUpload.classList.contains('buka'))document.body.style.overflow=''; }
+  document.getElementById('btnTutupMasuk').addEventListener('click',tutupMasuk);
+  document.getElementById('btnBatalMasuk').addEventListener('click',tutupMasuk);
+  lapisMasuk.addEventListener('click',function(e){if(e.target===lapisMasuk)tutupMasuk()});
+  btnMasukEl.addEventListener('click',function(){
+    if(SESI){ SESI=null; try{localStorage.removeItem('albumSesi')}catch(e){} segarkanTombolMasuk(); return; }
+    bukaMasuk(null);
+  });
+  var btnKirimMasuk=document.getElementById('btnKirimMasuk');
+  btnKirimMasuk.addEventListener('click',function(){
+    var nip=document.getElementById('mNip').value.trim(), sandi=document.getElementById('mSandi').value;
+    if(!nip||!sandi){mStatus.textContent='NIP dan kata sandi wajib diisi.'; return}
+    btnKirimMasuk.disabled=true; mStatus.textContent='Memeriksa...';
+    jsonpAlbum({aksi:'login', nip:nip, sandi:sandi}).then(function(d){
+      btnKirimMasuk.disabled=false;
+      if(d&&d.ok&&d.token){
+        SESI={token:d.token, nama:d.nama, nip:d.nip, peran:d.peran};
+        try{localStorage.setItem('albumSesi',JSON.stringify(SESI))}catch(e){}
+        segarkanTombolMasuk(); tutupMasuk();
+        if(sesudahMasuk){var f=sesudahMasuk; sesudahMasuk=null; f();}
+      } else {
+        mStatus.textContent=(d&&d.pesan)||'Tidak bisa masuk. Periksa NIP dan kata sandi.';
+      }
+    });
+  });
+
   var lapisUpload=document.getElementById('lapisUpload'), uStatus=document.getElementById('uStatus'), uFotoDaftar=document.getElementById('uFotoDaftar');
   function tambahBarisFoto(){
     if(uFotoDaftar.children.length>=6)return;
+    uFotoDaftar.appendChild(buatBarisBerkas());
+  }
+  /* Baris berkas bersama (dipakai panel unggah & panel edit): ada tombol
+     hapus per berkas dan pemeriksaan syarat langsung saat berkas dipilih.
+     Berkas yang tidak memenuhi syarat ditandai merah beserta alasannya;
+     pengiriman diblokir sampai berkas itu dihapus (tombol ×) atau diganti. */
+  function buatBarisBerkas(){
     var r=document.createElement('div');
-    r.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
-    r.innerHTML='<input type="file" accept="image/*,video/*" style="flex:1;min-width:190px;min-height:44px;padding:8px;border:1.5px solid #c9cfda;border-radius:10px;background:#fff"><input type="text" maxlength="120" placeholder="Keterangan foto / video" style="flex:1;min-width:150px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit">';
-    uFotoDaftar.appendChild(r);
+    r.style.cssText='display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start';
+    r.innerHTML='<input type="file" accept="image/*,video/*" style="flex:1;min-width:180px;min-height:44px;padding:8px;border:1.5px solid #c9cfda;border-radius:10px;background:#fff">'
+      +'<input type="text" maxlength="120" placeholder="Keterangan foto / video" style="flex:1;min-width:140px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit">'
+      +'<button type="button" class="btn-buang-baris" aria-label="Hapus berkas ini" title="Hapus berkas ini" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #b3261e;background:#fff;color:#b3261e;font-size:18px;font-weight:900;flex:none">×</button>'
+      +'<div class="alasan-berkas" style="display:none;flex-basis:100%;font-size:12px;font-weight:800;color:#b3261e"></div>';
+    var inp=r.querySelector('input[type=file]'), alasan=r.querySelector('.alasan-berkas');
+    inp.addEventListener('change',function(){
+      delete r.dataset.salah; alasan.style.display='none'; inp.style.borderColor='#c9cfda';
+      var f=inp.files[0]; if(!f)return;
+      var masalah='';
+      if(f.type.indexOf('video/')===0){ if(f.size>MAKS_VIDEO)masalah='Video ini '+Math.round(f.size/1048576)+' MB, melebihi batas 25 MB.'; }
+      else if(f.type.indexOf('image/')!==0){ masalah='Berkas ini bukan foto atau video.'; }
+      if(masalah){ r.dataset.salah=masalah; alasan.textContent='Tidak memenuhi syarat: '+masalah+' Hapus dengan tombol × atau ganti berkasnya.'; alasan.style.display='block'; inp.style.borderColor='#b3261e'; }
+    });
+    r.querySelector('.btn-buang-baris').addEventListener('click',function(){
+      var induk=r.parentNode;
+      if(induk&&induk.children.length>1){ r.remove(); }
+      else { inp.value=''; delete r.dataset.salah; alasan.style.display='none'; inp.style.borderColor='#c9cfda'; }
+    });
+    return r;
   }
   tambahBarisFoto(); tambahBarisFoto();
   document.getElementById('btnTambahFoto').addEventListener('click',tambahBarisFoto);
   function bukaUpload(){lapisUpload.classList.add('buka'); document.body.style.overflow='hidden'; document.getElementById('uNama').focus()}
   function tutupUpload(){lapisUpload.classList.remove('buka'); document.body.style.overflow=''}
-  document.getElementById('btnUpload').addEventListener('click',bukaUpload);
+  document.getElementById('btnUpload').addEventListener('click',function(){
+    if(!SESI){ bukaMasuk(function(){bukaUpload()}); return; }
+    bukaUpload();
+  });
   document.getElementById('btnTutupUpload').addEventListener('click',tutupUpload);
   document.getElementById('btnBatalUpload').addEventListener('click',tutupUpload);
   lapisUpload.addEventListener('click',function(e){if(e.target===lapisUpload)tutupUpload()});
@@ -494,6 +584,8 @@ h1 span{color:#b8860b}
     if(!nama||!tanggal){uStatus.textContent='Nama kegiatan dan tanggal wajib diisi.'; return}
     var baris=Array.prototype.slice.call(uFotoDaftar.children).filter(function(r){return r.querySelector('input[type=file]').files.length});
     if(!baris.length){uStatus.textContent='Pilih minimal satu foto atau video dulu.'; return}
+    var barisSalah=baris.filter(function(r){return r.dataset.salah});
+    if(barisSalah.length){uStatus.textContent='Ada '+barisSalah.length+' berkas yang tidak memenuhi syarat. Hapus dulu berkas itu dengan tombol × merah, atau ganti dengan berkas yang memenuhi syarat.'; return}
     btnKirim.disabled=true; uStatus.textContent='Memproses foto dan video...';
     var kodeBaru=kodeAcak();
     var janji=baris.map(function(r){
@@ -507,7 +599,7 @@ h1 span{color:#b8860b}
         nama:nama, tanggal:tanggal,
         jenis:document.getElementById('uJenis').value.trim(),
         ringkas:document.getElementById('uRingkas').value.trim(),
-        kode:kodeBaru,
+        kode:kodeBaru, token:SESI?SESI.token:'',
         media:media
       })}).then(function(){
         uStatus.textContent='Terkirim, menunggu album tampil...';
@@ -546,12 +638,7 @@ h1 span{color:#b8860b}
       +'<label style="font-size:12px;font-weight:800;color:#b3261e;display:flex;gap:5px;align-items:center;min-height:44px"><input type="checkbox" class="e-buang" style="width:20px;height:20px"> Buang</label>';
     return r;
   }
-  function barisMediaBaru(){
-    var r=document.createElement('div');
-    r.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
-    r.innerHTML='<input type="file" accept="image/*,video/*" style="flex:1;min-width:190px;min-height:44px;padding:8px;border:1.5px solid #c9cfda;border-radius:10px;background:#fff"><input type="text" maxlength="120" placeholder="Keterangan foto / video" style="flex:1;min-width:150px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit">';
-    return r;
-  }
+  function barisMediaBaru(){ return buatBarisBerkas(); }
   document.getElementById('btnTambahMediaEdit').addEventListener('click',function(){
     if(eMediaDaftar.querySelectorAll(':scope > div').length+eBaruDaftar.children.length>=10){eStatus.textContent='Jumlah berkas dibatasi.'; return}
     eBaruDaftar.appendChild(barisMediaBaru());
@@ -586,7 +673,7 @@ h1 span{color:#b8860b}
   btnSimpanEdit.addEventListener('click',function(){
     var a=DATA[aktif]; if(!a)return;
     var kode=document.getElementById('eKode').value.trim().toUpperCase();
-    if(!kode){eStatus.textContent='Kode edit wajib diisi.'; return}
+    if(!kode&&!SESI){eStatus.textContent='Kode edit wajib diisi (atau masuk dulu sebagai pengunggah album ini).'; return}
     var namaBaru=document.getElementById('eNama').value.trim();
     if(!namaBaru){eStatus.textContent='Nama kegiatan tidak boleh kosong.'; return}
     var media=[];
@@ -595,6 +682,7 @@ h1 span{color:#b8860b}
       media.push({fid:r.dataset.fid, video:r.dataset.video==='1', ket:r.querySelector('input[type=text]').value.trim()});
     });
     var barisBaru=Array.prototype.slice.call(eBaruDaftar.children).filter(function(r){return r.querySelector('input[type=file]').files.length});
+    if(barisBaru.some(function(r){return r.dataset.salah})){eStatus.textContent='Ada berkas baru yang tidak memenuhi syarat. Hapus dengan tombol × merah atau ganti berkasnya.'; return}
     btnSimpanEdit.disabled=true; eStatus.textContent='Memproses dan menyimpan...';
     Promise.all(barisBaru.map(function(r){
       return prosesMedia(r.querySelector('input[type=file]').files[0]).then(function(m){ m.ket=r.querySelector('input[type=text]').value.trim(); return m; });
@@ -602,7 +690,7 @@ h1 span{color:#b8860b}
       var semua=media.concat(baru);
       if(!semua.length){ eStatus.textContent='Album harus punya minimal satu foto atau video.'; btnSimpanEdit.disabled=false; return; }
       var ubahLama=a.ubah;
-      return kirimDanTunggu({aksi:'edit', id:a.id, kode:kode, nama:namaBaru,
+      return kirimDanTunggu({aksi:'edit', id:a.id, kode:kode, token:SESI?SESI.token:'', nama:namaBaru,
         tanggal:document.getElementById('eTanggal').value.trim(),
         jenis:document.getElementById('eJenis').value.trim(),
         ringkas:document.getElementById('eRingkas').value.trim(), media:semua},
@@ -623,10 +711,10 @@ h1 span{color:#b8860b}
   document.getElementById('btnHapusAlbum').addEventListener('click',function(){
     var a=DATA[aktif]; if(!a)return;
     var kode=document.getElementById('eKode').value.trim().toUpperCase();
-    if(!kode){eStatus.textContent='Isi kode edit dulu sebelum menghapus.'; return}
+    if(!kode&&!SESI){eStatus.textContent='Isi kode edit dulu sebelum menghapus (atau masuk sebagai pengunggah).'; return}
     if(!window.confirm('Hapus album "'+a.nama+'" selamanya? Foto dan videonya juga dibuang.'))return;
     eStatus.textContent='Menghapus...';
-    kirimDanTunggu({aksi:'hapus', id:a.id, kode:kode}, function(albums){
+    kirimDanTunggu({aksi:'hapus', id:a.id, kode:kode, token:SESI?SESI.token:''}, function(albums){
       return !albums.some(function(x){return x.id===a.id});
     }).then(function(berhasil){
       if(berhasil){ tutupEdit(); tutup(); }
