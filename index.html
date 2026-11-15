@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dokumentasi Pelatihan, Album Lurus dan Penampil Foto</title>
-<!-- v15 (15 Nov 2026): halaman login DIHAPUS atas perintah pemilik. Semua pengunjung langsung bisa membuka web dan mengunggah foto tanpa masuk; backend API v1.5 menerima unggahan publik. Ubah/hapus album tetap memakai kode edit. -->
+<!-- v16 (15 Nov 2026): teks kartu muat otomatis di blok bawah saja; judul menyusut otomatis sampai muat, tidak tumpah ke foto. v15: halaman login dihapus, unggah publik (backend API v1.5); ubah/hapus album tetap memakai kode edit. -->
 <!--
   Design Read: halaman pameran album dokumentasi pelatihan untuk pengunjung umum dan pimpinan,
   bahasa visual editorial terang identitas APPEL (navy #0a1f3c, emas #f5b921, latar krem netral).
@@ -42,12 +42,16 @@ h1 span{color:#b8860b}
 /* Panggung album lurus */
 .panggung{position:relative;height:500px;perspective:1100px;overflow:hidden;cursor:grab;touch-action:pan-y}
 .panggung.menyeret{cursor:grabbing}
-.kartu{position:absolute;left:50%;top:44%;width:208px;height:288px;margin-left:-104px;margin-top:-144px;border-radius:14px;overflow:hidden;box-shadow:0 22px 42px rgba(10,31,60,.30);display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff;will-change:transform,opacity;pointer-events:none}
+.kartu{position:absolute;left:50%;top:44%;width:208px;height:288px;margin-left:-104px;margin-top:-144px;border-radius:14px;overflow:hidden;box-shadow:0 22px 42px rgba(10,31,60,.30);display:flex;flex-direction:column;justify-content:flex-end;padding:0;color:#fff;will-change:transform,opacity;pointer-events:none}
 .kartu .foto{position:absolute;inset:0 0 auto 0;height:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;letter-spacing:.12em;color:#fff;background:rgba(0,0,0,.16);border-bottom:1px dashed rgba(255,255,255,.35);overflow:hidden}
 .kartu .foto img{width:100%;height:100%;object-fit:cover;display:block}
-.kartu .tgl{font-size:10px;font-weight:700;letter-spacing:.1em;opacity:.95;position:relative}
+.kartu .info{position:absolute;left:0;right:0;bottom:0;height:50%;padding:12px 16px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.kartu .info>*{flex:none}
+.kartu .info.rapat .meta{-webkit-line-clamp:1}
+.kartu .info.rapat .klik{display:none}
+.kartu .tgl{font-size:10px;font-weight:700;letter-spacing:.1em;opacity:.95;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kartu .nama{font-weight:900;line-height:1.02;font-size:24px;margin-top:6px;position:relative}
-.kartu .meta{font-size:12px;margin-top:8px;opacity:.92;line-height:1.45;position:relative}
+.kartu .meta{font-size:12px;margin-top:8px;opacity:.92;line-height:1.45;position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .w1{background:linear-gradient(165deg,#14365f,#0a1f3c)}.w2{background:linear-gradient(165deg,#8a6d1f,#6d5205)}.w3{background:linear-gradient(165deg,#24507e,#173a5e)}.w4{background:linear-gradient(165deg,#5b4a1f,#0a1f3c)}.w5{background:linear-gradient(165deg,#2e6b5e,#12332c)}.w6{background:linear-gradient(165deg,#7a3b2e,#3a1a12)}.w7{background:linear-gradient(165deg,#4a356e,#211638)}.w8{background:linear-gradient(165deg,#7a5a12,#0a1f3c)}
 .rel-garis{position:absolute;left:4%;right:4%;top:44%;border-top:2px dashed rgba(10,31,60,.18);pointer-events:none}
 .kendali{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:4px 16px 8px}
@@ -236,11 +240,40 @@ h1 span{color:#b8860b}
     kartuEls.forEach(function(el){el.remove()}); kartuEls=[];
     DATA.forEach(function(a,i){
       var d=document.createElement('div'); d.className='kartu '+a.kelas; d.dataset.i=i;
-      d.innerHTML='<div class="foto">'+(a.sampul?'<img src="'+a.sampul+'" alt="Foto sampul '+a.nama+'">':'FOTO KEGIATAN')+'</div><div class="tgl">'+a.tgl.toUpperCase()+'</div><div class="nama">'+a.nama+'</div><div class="meta">'+a.jenis+'<br>Klik untuk membuka</div>';
+      d.innerHTML='<div class="foto">'+(a.sampul?'<img src="'+a.sampul+'" alt="Foto sampul '+a.nama+'">':'FOTO KEGIATAN')+'</div><div class="info"><div class="tgl">'+a.tgl.toUpperCase()+'</div><div class="nama">'+a.nama+'</div><div class="meta">'+a.jenis+'<br><span class="klik">Klik untuk membuka</span></div></div>';
       panggung.appendChild(d); kartuEls.push(d);
     });
     N=DATA.length;
+    pasJudulKartu();
   }
+  /* v16: teks kartu HANYA boleh tinggal di blok bawah (.info, 50% bawah).
+     Judul menyusut otomatis sedikit demi sedikit sampai seluruh teks muat
+     di blok bawah; tidak ada lagi tulisan yang tumpah ke area foto. */
+  function pasJudulKartu(){
+    kartuEls.forEach(function(d){
+      var info=d.querySelector('.info'), nama=d.querySelector('.nama'),
+          tgl=d.querySelector('.tgl'), meta=d.querySelector('.meta');
+      if(!info||!nama)return;
+      info.classList.remove('rapat');
+      nama.style.fontSize=''; if(meta)meta.style.fontSize='';
+      var ukuran=parseFloat(getComputedStyle(nama).fontSize)||24,
+          ukuranMeta=meta?parseFloat(getComputedStyle(meta).fontSize)||12:12, jaga=0;
+      function tinggiIsi(){ return (tgl?tgl.offsetHeight:0)+nama.offsetHeight+(meta?meta.offsetHeight:0)+14; }
+      function muat(){ return tinggiIsi()<=info.clientHeight-24+1; }
+      while(!muat() && ukuran>12 && jaga<40){ ukuran-=1; nama.style.fontSize=ukuran+'px'; jaga++; }
+      jaga=0;
+      while(!muat() && meta && ukuranMeta>10 && jaga<20){ ukuranMeta-=0.5; meta.style.fontSize=ukuranMeta+'px'; jaga++; }
+      if(!muat()){
+        /* Kasus ekstrem: padatkan meta jadi satu baris (jenis dipotong
+           elipsis, baris "Klik untuk membuka" disembunyikan) dan beri
+           judul ruang bernapas terakhir sampai 11px. */
+        info.classList.add('rapat');
+        jaga=0;
+        while(!muat() && ukuran>11 && jaga<10){ ukuran-=1; nama.style.fontSize=ukuran+'px'; jaga++; }
+      }
+    });
+  }
+  window.addEventListener('resize',function(){ pasJudulKartu(); });
   bangunKartu();
   if(DATA.length===0){
     var kosong=document.createElement('div'); kosong.className='kosong';
