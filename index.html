@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dokumentasi Pelatihan, Album Lurus dan Penampil Foto</title>
-<!-- v17 (15 Nov 2026): tombol Kembali menutup popup, bukan keluar web; tombol Tambah Foto Saja di Edit Album untuk semua orang (backend API v1.6 aksi tambahFoto, tanpa kode). v16: teks kartu muat otomatis di blok bawah. v15: halaman login dihapus, unggah publik. -->
+<!-- v18 (15 Nov 2026): batas media per album dinaikkan 6 menjadi 12 (backend API v1.7). v17: tombol Kembali menutup popup, bukan keluar web; tombol Tambah Foto Saja di Edit Album untuk semua orang. v16: teks kartu muat otomatis di blok bawah. v15: halaman login dihapus, unggah publik. -->
 <!--
   Design Read: halaman pameran album dokumentasi pelatihan untuk pengunjung umum dan pimpinan,
   bahasa visual editorial terang identitas APPEL (navy #0a1f3c, emas #f5b921, latar krem netral).
@@ -484,7 +484,7 @@ h1 span{color:#b8860b}
 
   var lapisUpload=document.getElementById('lapisUpload'), uStatus=document.getElementById('uStatus'), uFotoDaftar=document.getElementById('uFotoDaftar');
   function tambahBarisFoto(){
-    if(uFotoDaftar.children.length>=6)return;
+    if(uFotoDaftar.children.length>=12)return;
     uFotoDaftar.appendChild(buatBarisBerkas());
   }
   /* Baris berkas bersama (dipakai panel unggah & panel edit): ada tombol
@@ -620,7 +620,7 @@ h1 span{color:#b8860b}
   }
   function barisMediaBaru(){ return buatBarisBerkas(); }
   document.getElementById('btnTambahMediaEdit').addEventListener('click',function(){
-    if(eMediaDaftar.querySelectorAll(':scope > div').length+eBaruDaftar.children.length>=6){eStatus.textContent='Satu album maksimal 6 foto atau video.'; return}
+    if(eMediaDaftar.querySelectorAll(':scope > div').length+eBaruDaftar.children.length>=12){eStatus.textContent='Satu album maksimal 12 foto atau video.'; return}
     eBaruDaftar.appendChild(barisMediaBaru());
   });
   document.getElementById('btnEditAlbum').addEventListener('click',function(){
@@ -705,7 +705,7 @@ h1 span{color:#b8860b}
   /* ===== Tambah Foto Saja (v17): publik, tanpa kode edit =====
      Hanya mengirim media BARU dari daftar tambah berkas; keterangan
      album dan media lama tidak disentuh. Server (aksi 'tambahFoto')
-     yang menegakkan batas total 6 media per album. */
+     yang menegakkan batas total 12 media per album. */
   var btnTambahFotoSaja=document.getElementById('btnTambahFotoSaja');
   btnTambahFotoSaja.addEventListener('click',function(){
     var a=DATA[aktif]; if(!a)return;
@@ -713,7 +713,7 @@ h1 span{color:#b8860b}
     if(!barisBaru.length){eStatus.textContent='Pilih dulu foto atau video baru pada bagian "Tambah foto / video baru" di atas.'; return}
     if(barisBaru.some(function(r){return r.dataset.salah})){eStatus.textContent='Ada berkas baru yang tidak memenuhi syarat. Hapus dengan tombol × merah atau ganti berkasnya.'; return}
     var jumlahLama=a.foto.filter(function(f){return typeof f!=='string'}).length;
-    if(jumlahLama+barisBaru.length>6){eStatus.textContent='Album ini sudah berisi '+jumlahLama+' dari maksimal 6 foto atau video. Kurangi jumlah berkas barunya.'; return}
+    if(jumlahLama+barisBaru.length>12){eStatus.textContent='Album ini sudah berisi '+jumlahLama+' dari maksimal 12 foto atau video. Kurangi jumlah berkas barunya.'; return}
     btnTambahFotoSaja.disabled=true; eStatus.textContent='Memproses dan menambahkan foto...';
     Promise.all(barisBaru.map(function(r){
       return prosesMedia(r.querySelector('input[type=file]').files[0]).then(function(m){ m.ket=r.querySelector('input[type=text]').value.trim(); return m; });
