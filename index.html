@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dokumentasi Pelatihan, Album Lurus dan Penampil Foto</title>
-<!-- v16 (15 Nov 2026): teks kartu muat otomatis di blok bawah saja; judul menyusut otomatis sampai muat, tidak tumpah ke foto. v15: halaman login dihapus, unggah publik (backend API v1.5); ubah/hapus album tetap memakai kode edit. -->
+<!-- v17 (15 Nov 2026): tombol Kembali menutup popup, bukan keluar web; tombol Tambah Foto Saja di Edit Album untuk semua orang (backend API v1.6 aksi tambahFoto, tanpa kode). v16: teks kartu muat otomatis di blok bawah. v15: halaman login dihapus, unggah publik. -->
 <!--
   Design Read: halaman pameran album dokumentasi pelatihan untuk pengunjung umum dan pimpinan,
   bahasa visual editorial terang identitas APPEL (navy #0a1f3c, emas #f5b921, latar krem netral).
@@ -190,9 +190,9 @@ h1 span{color:#b8860b}
   <div class="detail">
     <button type="button" class="tutup" id="btnTutupEdit" aria-label="Tutup edit">×</button>
     <h2 id="eJudul" style="font-size:24px;line-height:1.2;padding-right:52px">Edit Album</h2>
-    <p class="info">Masukkan kode edit yang kamu terima saat album diterbitkan untuk mengubah album ini.</p>
+    <p class="info">Siapa pun bisa menambahkan foto ke album ini tanpa kode, pakai tombol Tambah Foto Saja. Untuk mengubah keterangan, membuang foto, atau menghapus album, perlu kode edit yang diterima pengunggah saat album diterbitkan.</p>
     <div style="display:grid;gap:10px;margin-top:14px">
-      <label style="font-weight:800;font-size:13px">Kode edit *
+      <label style="font-weight:800;font-size:13px">Kode edit (untuk mengubah keterangan / menghapus)
         <input id="eKode" type="text" maxlength="12" placeholder="mis. K7P2QX" style="display:block;width:100%;margin-top:5px;min-height:44px;padding:10px 12px;border:1.5px solid #c9cfda;border-radius:10px;font:inherit;font-weight:700;letter-spacing:.12em;text-transform:uppercase">
       </label>
       <label style="font-weight:800;font-size:13px">Nama kegiatan
@@ -215,6 +215,7 @@ h1 span{color:#b8860b}
     <button type="button" id="btnTambahMediaEdit" style="margin-top:10px;border:1.5px dashed #0a1f3c;background:#fff;color:#0a1f3c;border-radius:999px;padding:10px 16px;font-weight:800;font-size:13px;min-height:44px">Tambah berkas</button>
     <p id="eStatus" style="font-size:13px;font-weight:700;color:#445065;margin-top:12px" aria-live="polite"></p>
     <div class="nav">
+      <button type="button" id="btnTambahFotoSaja" style="background:#1d7a4f;color:#fff">Tambah Foto Saja</button>
       <button type="button" id="btnHapusAlbum" style="border-color:#b3261e;color:#b3261e">Hapus Album</button>
       <button type="button" id="btnSimpanEdit" style="background:#0a1f3c;color:#fff">Simpan Perubahan</button>
     </div>
@@ -429,10 +430,10 @@ h1 span{color:#b8860b}
      sebagai kotak navy kosong raksasa, lalu berganti mendadak ke detail putih. */
   function terbangBuka(i){
     aktif=i; pemicu=document.activeElement;
-    isiDetail(); lapis.classList.add('buka'); document.body.style.overflow='hidden';
+    isiDetail(); lapis.classList.add('buka'); document.body.style.overflow='hidden'; lapisDibuka('detail');
     document.getElementById('btnTutup').focus();
   }
-  function tutup(){hentiPutar();lapis.classList.remove('buka');document.body.style.overflow='';if(pemicu&&pemicu.focus)pemicu.focus()}
+  function tutup(){hentiPutar();lapis.classList.remove('buka');document.body.style.overflow='';if(pemicu&&pemicu.focus)pemicu.focus();lapisDitutup('detail')}
   function gantiAlbum(arah,kelas){
     aktif=(aktif+arah+N)%N; isiDetail();
     kotak.classList.remove('ganti-kiri','ganti-kanan'); void kotak.offsetWidth; kotak.classList.add(kelas);
@@ -515,8 +516,8 @@ h1 span{color:#b8860b}
   }
   tambahBarisFoto(); tambahBarisFoto();
   document.getElementById('btnTambahFoto').addEventListener('click',tambahBarisFoto);
-  function bukaUpload(){lapisUpload.classList.add('buka'); document.body.style.overflow='hidden'; document.getElementById('uNama').focus()}
-  function tutupUpload(){lapisUpload.classList.remove('buka'); document.body.style.overflow=''}
+  function bukaUpload(){lapisUpload.classList.add('buka'); document.body.style.overflow='hidden'; document.getElementById('uNama').focus(); lapisDibuka('unggah')}
+  function tutupUpload(){lapisUpload.classList.remove('buka'); document.body.style.overflow=''; lapisDitutup('unggah')}
   document.getElementById('btnUpload').addEventListener('click',function(){
     bukaUpload();
   });
@@ -604,7 +605,7 @@ h1 span{color:#b8860b}
   /* ===== Edit Album (v8, berkode edit) ===== */
   var lapisEdit=document.getElementById('lapisEdit'), eStatus=document.getElementById('eStatus'),
       eMediaDaftar=document.getElementById('eMediaDaftar'), eBaruDaftar=document.getElementById('eBaruDaftar');
-  function tutupEdit(){lapisEdit.classList.remove('buka'); if(!lapis.classList.contains('buka'))document.body.style.overflow=''}
+  function tutupEdit(){lapisEdit.classList.remove('buka'); if(!lapis.classList.contains('buka'))document.body.style.overflow=''; lapisDitutup('edit')}
   document.getElementById('btnTutupEdit').addEventListener('click',tutupEdit);
   lapisEdit.addEventListener('click',function(e){if(e.target===lapisEdit)tutupEdit()});
   function barisMediaLama(f){
@@ -619,7 +620,7 @@ h1 span{color:#b8860b}
   }
   function barisMediaBaru(){ return buatBarisBerkas(); }
   document.getElementById('btnTambahMediaEdit').addEventListener('click',function(){
-    if(eMediaDaftar.querySelectorAll(':scope > div').length+eBaruDaftar.children.length>=10){eStatus.textContent='Jumlah berkas dibatasi.'; return}
+    if(eMediaDaftar.querySelectorAll(':scope > div').length+eBaruDaftar.children.length>=6){eStatus.textContent='Satu album maksimal 6 foto atau video.'; return}
     eBaruDaftar.appendChild(barisMediaBaru());
   });
   document.getElementById('btnEditAlbum').addEventListener('click',function(){
@@ -632,7 +633,7 @@ h1 span{color:#b8860b}
     eStatus.textContent='';
     eMediaDaftar.innerHTML=''; eBaruDaftar.innerHTML='';
     a.foto.forEach(function(f){ if(typeof f!=='string') eMediaDaftar.appendChild(barisMediaLama(f)); });
-    lapisEdit.classList.add('buka'); document.body.style.overflow='hidden';
+    lapisEdit.classList.add('buka'); document.body.style.overflow='hidden'; lapisDibuka('edit');
   });
   function kirimDanTunggu(payload, syarat){
     return fetch(API_ALBUM,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)}).then(function(){
@@ -699,6 +700,63 @@ h1 span{color:#b8860b}
       if(berhasil){ tutupEdit(); tutup(); }
       else eStatus.textContent='Album belum terhapus. Kemungkinan kode edit salah.';
     });
+  });
+
+  /* ===== Tambah Foto Saja (v17): publik, tanpa kode edit =====
+     Hanya mengirim media BARU dari daftar tambah berkas; keterangan
+     album dan media lama tidak disentuh. Server (aksi 'tambahFoto')
+     yang menegakkan batas total 6 media per album. */
+  var btnTambahFotoSaja=document.getElementById('btnTambahFotoSaja');
+  btnTambahFotoSaja.addEventListener('click',function(){
+    var a=DATA[aktif]; if(!a)return;
+    var barisBaru=Array.prototype.slice.call(eBaruDaftar.children).filter(function(r){return r.querySelector('input[type=file]').files.length});
+    if(!barisBaru.length){eStatus.textContent='Pilih dulu foto atau video baru pada bagian "Tambah foto / video baru" di atas.'; return}
+    if(barisBaru.some(function(r){return r.dataset.salah})){eStatus.textContent='Ada berkas baru yang tidak memenuhi syarat. Hapus dengan tombol × merah atau ganti berkasnya.'; return}
+    var jumlahLama=a.foto.filter(function(f){return typeof f!=='string'}).length;
+    if(jumlahLama+barisBaru.length>6){eStatus.textContent='Album ini sudah berisi '+jumlahLama+' dari maksimal 6 foto atau video. Kurangi jumlah berkas barunya.'; return}
+    btnTambahFotoSaja.disabled=true; eStatus.textContent='Memproses dan menambahkan foto...';
+    Promise.all(barisBaru.map(function(r){
+      return prosesMedia(r.querySelector('input[type=file]').files[0]).then(function(m){ m.ket=r.querySelector('input[type=text]').value.trim(); return m; });
+    })).then(function(baru){
+      return kirimDanTunggu({aksi:'tambahFoto', id:a.id, media:baru},
+        function(albums){ var t=albums.filter(function(x){return x.id===a.id})[0]; return !!t&&t.foto.length>=jumlahLama+baru.length; }
+      ).then(function(berhasil){
+        btnTambahFotoSaja.disabled=false;
+        if(berhasil){
+          tutupEdit();
+          var idx=DATA.findIndex(function(x){return x.id===a.id});
+          if(idx>=0){ aktif=idx; isiDetail(); }
+        } else {
+          eStatus.textContent='Foto belum terkonfirmasi tampil. Coba lagi sebentar lagi.';
+        }
+      });
+    }).catch(function(err){ btnTambahFotoSaja.disabled=false; eStatus.textContent='Gagal: '+err.message; });
+  });
+
+  /* ===== Tombol Kembali menutup popup, bukan keluar web (v17) =====
+     Popup yang terbuka dicatat bertumpuk. Saat popup pertama dibuka,
+     satu entri riwayat dipasang. Tombol Kembali memicu popstate yang
+     menutup popup teratas; menutup lewat tombol di layar mengonsumsi
+     entri itu diam-diam (abaikanPop). Tanpa popup terbuka, tombol
+     Kembali bekerja seperti biasa. */
+  var tumpukanLapis=[], jebakanAktif=false, abaikanPop=false;
+  function lapisDibuka(id){
+    if(tumpukanLapis.indexOf(id)>=0)return;
+    if(!tumpukanLapis.length&&!jebakanAktif){ try{history.pushState({lapisAlbum:1},'')}catch(e){} jebakanAktif=true; }
+    tumpukanLapis.push(id);
+  }
+  function lapisDitutup(id){
+    var i=tumpukanLapis.indexOf(id); if(i>=0)tumpukanLapis.splice(i,1);
+    if(!tumpukanLapis.length&&jebakanAktif){ jebakanAktif=false; abaikanPop=true; try{history.back()}catch(e){} }
+  }
+  var tutupBerdasarkanId={detail:tutup, unggah:tutupUpload, edit:tutupEdit};
+  window.addEventListener('popstate',function(){
+    if(abaikanPop){ abaikanPop=false; return; }
+    if(!jebakanAktif)return;
+    jebakanAktif=false;
+    var id=tumpukanLapis[tumpukanLapis.length-1];
+    if(id&&tutupBerdasarkanId[id])tutupBerdasarkanId[id]();
+    if(tumpukanLapis.length){ try{history.pushState({lapisAlbum:1},'')}catch(e){} jebakanAktif=true; }
   });
 })();
 </script>
