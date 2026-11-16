@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dokumentasi Pelatihan, Album Lurus dan Penampil Foto</title>
-<!-- v19 (16 Nov 2026): refresh otomatis daftar album (tiap 30 detik, saat halaman kembali aktif/dilihat, dan sesudah popup ditutup); posisi album fokus dijaga, popup yang terbuka tidak diganggu. v18: batas media per album 12. v17: tombol Kembali menutup popup; Tambah Foto Saja publik. v16: teks kartu muat otomatis di blok bawah. v15: halaman login dihapus, unggah publik. -->
+<!-- v20 (16 Nov 2026): foto HEIC/HEIF dari kamera HP bisa diunggah; bila peramban tidak bisa membacanya, berkas asli dikirim ke server dan Google Drive yang menampilkannya (backend API v1.8). v19: refresh otomatis daftar album. v18: batas media per album 12. v17: tombol Kembali menutup popup; Tambah Foto Saja publik. v16: teks kartu muat otomatis di blok bawah. v15: halaman login dihapus, unggah publik. -->
 <!--
   Design Read: halaman pameran album dokumentasi pelatihan untuk pengunjung umum dan pimpinan,
   bahasa visual editorial terang identitas APPEL (navy #0a1f3c, emas #f5b921, latar krem netral).
@@ -561,7 +561,7 @@ h1 span{color:#b8860b}
       var f=inp.files[0]; if(!f)return;
       var masalah='';
       if(f.type.indexOf('video/')===0){ if(f.size>MAKS_VIDEO)masalah='Video ini '+Math.round(f.size/1048576)+' MB, melebihi batas 25 MB.'; }
-      else if(f.type.indexOf('image/')!==0){ masalah='Berkas ini bukan foto atau video.'; }
+      else if(f.type.indexOf('image/')!==0&&!/\.(heic|heif)$/i.test(f.name||'')){ masalah='Berkas ini bukan foto atau video.'; }
       if(masalah){ r.dataset.salah=masalah; alasan.textContent='Tidak memenuhi syarat: '+masalah+' Hapus dengan tombol × atau ganti berkasnya.'; alasan.style.display='block'; inp.style.borderColor='#b3261e'; }
     });
     r.querySelector('.btn-buang-baris').addEventListener('click',function(){
@@ -597,6 +597,7 @@ h1 span{color:#b8860b}
     });
   }
   var MAKS_VIDEO=25*1024*1024;
+  function berkasHeic_(file){ return /image\/hei[cf]/i.test(file.type||'')||/\.(heic|heif)$/i.test(file.name||''); }
   function prosesMedia(file){
     if(file.type.indexOf('video/')===0){
       if(file.size>MAKS_VIDEO)return Promise.reject(new Error('Video "'+file.name+'" melebihi 25 MB'));
@@ -607,7 +608,19 @@ h1 span{color:#b8860b}
         r.readAsDataURL(file);
       });
     }
-    return prosesFoto(file).then(function(data){return {data:data}});
+    return prosesFoto(file).then(function(data){return {data:data}}).catch(function(err){
+      if(!berkasHeic_(file))throw err;
+      /* v20: peramban HP umumnya TIDAK bisa membaca HEIC, jadi berkas
+         aslinya dikirim ke server apa adanya; Google Drive mengubahnya
+         menjadi gambar tampil (backend v1.8, terbukti ujung ke ujung). */
+      if(file.size>MAKS_VIDEO)throw new Error('Foto HEIC "'+file.name+'" melebihi 25 MB');
+      return new Promise(function(res,rej){
+        var r=new FileReader();
+        r.onload=function(){res({data:String(r.result).split(',')[1], mime:'image/heic'})};
+        r.onerror=function(){rej(err)};
+        r.readAsDataURL(file);
+      });
+    });
   }
   function kodeAcak(){
     var ab='ABCDEFGHJKMNPQRSTUVWXYZ23456789', s='';
