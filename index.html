@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dokumentasi Pelatihan, Album Lurus dan Penampil Foto</title>
-<!-- v18 (15 Nov 2026): batas media per album dinaikkan 6 menjadi 12 (backend API v1.7). v17: tombol Kembali menutup popup, bukan keluar web; tombol Tambah Foto Saja di Edit Album untuk semua orang. v16: teks kartu muat otomatis di blok bawah. v15: halaman login dihapus, unggah publik. -->
+<!-- v19 (16 Nov 2026): refresh otomatis daftar album (tiap 30 detik, saat halaman kembali aktif/dilihat, dan sesudah popup ditutup); posisi album fokus dijaga, popup yang terbuka tidak diganggu. v18: batas media per album 12. v17: tombol Kembali menutup popup; Tambah Foto Saja publik. v16: teks kartu muat otomatis di blok bawah. v15: halaman login dihapus, unggah publik. -->
 <!--
   Design Read: halaman pameran album dokumentasi pelatihan untuk pengunjung umum dan pimpinan,
   bahasa visual editorial terang identitas APPEL (navy #0a1f3c, emas #f5b921, latar krem netral).
@@ -477,10 +477,67 @@ h1 span{color:#b8860b}
       if(a.foto&&a.foto.length)a.sampul=a.foto[0].src;
     });
     DATA=albumServer.concat(DATA_TETAP);
+    tandaDataServer=tandaDari(albumServer);
     geser=0; bangunKartu();
     return true;
   }
-  muatDariServer().then(function(d){if(d&&d.ok)gabungServer(d.album)});
+
+  /* ===== Refresh otomatis (v19) =====
+     Daftar album diperiksa ulang ke server tiap 30 detik, saat halaman
+     kembali terlihat/aktif, dan sesudah popup ditutup. Perubahan hanya
+     diterapkan bila tanda datanya berubah. Album yang sedang jadi fokus
+     dijaga tetap di tengah supaya korsel tidak melompat, dan selama ada
+     popup terbuka atau kartu sedang diseret, penerapan ditunda. */
+  var SEGAR_TIAP_MS=30000, segarSedangBerjalan=false, tandaDataServer='', cekTerakhir=0;
+  function tandaDari(albumServer){
+    return (albumServer||[]).map(function(a){
+      return [a.id||'', a.ubah||'', a.nama||'', a.tgl||'', a.jenis||'',
+        (a.foto||[]).map(function(f){return (f.fid||'')+':'+(f.ket||'')}).join('.')].join('|');
+    }).join(';;');
+  }
+  function popupTerbuka(){ return !!document.querySelector('.lapis.buka'); }
+  function terapkanDataServer(albumServer){
+    var kunciFokus='', geserLama=geser, rLama=0;
+    if(DATA.length){
+      var idxLama=indeksFokus(), aLama=DATA[idxLama];
+      if(aLama){ kunciFokus=aLama.id||aLama.nama||''; rLama=bungkusRel(idxLama-geserLama); }
+    }
+    albumServer.forEach(function(a,i){
+      a.kelas='w'+((i%8)+1);
+      if(a.foto&&a.foto.length)a.sampul=a.foto[0].src;
+    });
+    DATA=albumServer.concat(DATA_TETAP);
+    bangunKartu();
+    if(kunciFokus){
+      var idxBaru=-1;
+      DATA.forEach(function(a,i){ if((a.id||a.nama||'')===kunciFokus) idxBaru=i; });
+      if(idxBaru>=0){
+        var dasar=idxBaru-rLama, m=Math.round((geserLama-dasar)/N);
+        geser=dasar+m*N;
+      }
+    }
+  }
+  function segarkanAlbum(paksa){
+    var kini=Date.now();
+    if(segarSedangBerjalan)return;
+    if(!paksa&&kini-cekTerakhir<5000)return;
+    if(document.hidden)return;
+    if(!paksa&&(popupTerbuka()||seret))return;
+    segarSedangBerjalan=true; cekTerakhir=kini;
+    muatDariServer().then(function(d){
+      segarSedangBerjalan=false;
+      if(!d||!d.ok||!d.album)return;
+      var tanda=tandaDari(d.album);
+      if(tanda===tandaDataServer)return;
+      tandaDataServer=tanda;
+      terapkanDataServer(d.album);
+    },function(){ segarSedangBerjalan=false; });
+  }
+  setInterval(function(){ segarkanAlbum(false); },SEGAR_TIAP_MS);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden)segarkanAlbum(false); });
+  window.addEventListener('pageshow',function(){ segarkanAlbum(false); });
+  window.addEventListener('focus',function(){ segarkanAlbum(false); });
+  segarkanAlbum(true);
 
   var lapisUpload=document.getElementById('lapisUpload'), uStatus=document.getElementById('uStatus'), uFotoDaftar=document.getElementById('uFotoDaftar');
   function tambahBarisFoto(){
@@ -748,6 +805,7 @@ h1 span{color:#b8860b}
   function lapisDitutup(id){
     var i=tumpukanLapis.indexOf(id); if(i>=0)tumpukanLapis.splice(i,1);
     if(!tumpukanLapis.length&&jebakanAktif){ jebakanAktif=false; abaikanPop=true; try{history.back()}catch(e){} }
+    if(!tumpukanLapis.length){ setTimeout(function(){ segarkanAlbum(false); },600); }
   }
   var tutupBerdasarkanId={detail:tutup, unggah:tutupUpload, edit:tutupEdit};
   window.addEventListener('popstate',function(){
