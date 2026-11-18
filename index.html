@@ -77,6 +77,20 @@ h1 span{color:#b8860b}
 .panggung-foto img{width:100%;height:100%;object-fit:cover;display:block}
 .panggung-foto .kerangka{position:absolute;inset:0;display:flex;align-items:flex-end;padding:16px;color:#fff;font-weight:800;font-size:16px;line-height:1.4}
 .panggung-foto .label-foto{position:absolute;left:0;right:0;bottom:0;padding:28px 16px 12px;background:linear-gradient(transparent,rgba(0,0,0,.55));color:#fff;font-weight:700;font-size:14px;line-height:1.4}
+.panggung-foto .slide-foto img{cursor:zoom-in}
+.chip-asli{position:absolute;top:10px;right:10px;background:rgba(7,18,34,.8);color:#fff;font-size:12px;font-weight:800;padding:6px 11px;border-radius:99px;pointer-events:none;z-index:3}
+.lapis-foto{position:fixed;inset:0;background:rgba(3,10,22,.97);display:none;flex-direction:column;z-index:40}
+.lapis-foto.buka{display:flex}
+.lf-atas{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;color:#fff}
+.lf-judul{font-weight:800;font-size:13px;letter-spacing:.08em;opacity:.85}
+.lf-tutup{width:44px;height:44px;border-radius:50%;border:0;background:#f5b921;color:#0a1f3c;font-size:20px;font-weight:900}
+.lf-panggung{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:0 10px;min-height:0}
+.lf-panggung img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.lf-panggung.zoom{display:block;text-align:center}
+.lf-panggung.zoom img{max-width:none;max-height:none;width:200%;height:auto;margin:0 auto}
+.lf-bawah{display:flex;gap:10px;align-items:center;padding:12px;background:rgba(7,18,34,.9)}
+.lf-bawah button{min-height:44px;padding:8px 16px;border-radius:99px;border:2px solid #f5b921;background:transparent;color:#fff;font-weight:800;white-space:nowrap}
+.lf-bawah span{flex:1;text-align:center;color:#fff;font-size:13px;font-weight:700;line-height:1.4}
 .slide-foto{position:absolute;inset:0;transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1);will-change:opacity,transform}
 .slide-foto.pergi{opacity:0;transform:scale(.99);pointer-events:none}
 .bar-foto{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;flex-wrap:wrap}
@@ -150,6 +164,16 @@ h1 span{color:#b8860b}
       <button type="button" id="btnEditAlbum" style="display:none;background:#f5b921;color:#0a1f3c;border-color:#0a1f3c">Edit Album</button>
       <button type="button" id="btnAlbumSesudah">Album berikutnya</button>
     </div>
+  </div>
+</div>
+
+<div class="lapis-foto" id="lapisFoto" role="dialog" aria-modal="true" aria-label="Foto ukuran asli">
+  <div class="lf-atas"><span class="lf-judul">UKURAN ASLI</span><button type="button" class="lf-tutup" id="btnTutupFoto" aria-label="Tutup foto ukuran asli">×</button></div>
+  <div class="lf-panggung" id="lfPanggung"><img id="lfImg" alt=""></div>
+  <div class="lf-bawah">
+    <button type="button" id="btnFotoAsliSebelum">&lsaquo; Sebelumnya</button>
+    <span id="lfKet"></span>
+    <button type="button" id="btnFotoAsliSesudah">Berikutnya &rsaquo;</button>
   </div>
 </div>
 
@@ -364,6 +388,8 @@ h1 span{color:#b8860b}
       var lv=document.createElement('div'); lv.className='label-foto'; lv.textContent='VIDEO, '+(f.ket||''); s.appendChild(lv);
     } else {
       var img=document.createElement('img'); img.src=f.src; img.alt=f.ket; s.appendChild(img);
+      img.addEventListener('click',function(){bukaFotoAsli()});
+      var chipAsli=document.createElement('div'); chipAsli.className='chip-asli'; chipAsli.textContent='Ketuk untuk ukuran asli'; s.appendChild(chipAsli);
       var lb=document.createElement('div'); lb.className='label-foto'; lb.textContent=f.ket; s.appendChild(lb);
     }
     return s;
@@ -393,6 +419,53 @@ h1 span{color:#b8860b}
     if(im&&im.decode){im.decode().then(go).catch(go); setTimeout(go,180)} else {jalankan()}
     indikator();
   }
+  /* v21 (18 Nov 2026): foto di panggung detail bisa diketuk untuk melihat
+     ukuran asli (lightbox). URL asli = thumbnail Drive sz=w2400, mentok di
+     ukuran berkas yang tersimpan. Lightbox terdaftar di tumpukan lapis
+     sebagai 'foto', jadi tombol Kembali menutupnya lebih dulu. */
+  var lapisFoto=document.getElementById('lapisFoto'), lfImg=document.getElementById('lfImg'),
+      lfKet=document.getElementById('lfKet'), lfPanggung=document.getElementById('lfPanggung');
+  function urlFotoAsli(f){
+    if(f&&f.fid)return 'https://drive.google.com/thumbnail?id='+f.fid+'&sz=w2400';
+    if(f&&f.src)return f.src.replace('sz=w1280','sz=w2400');
+    return '';
+  }
+  function fotoAsliTerbuka(){return lapisFoto.classList.contains('buka')}
+  function tampilFotoAsli(){
+    var a=DATA[aktif], f=a&&a.foto[fotoIdx];
+    if(!f||f.video||typeof f==='string')return;
+    lfImg.src=urlFotoAsli(f); lfImg.alt=f.ket||'';
+    lfKet.textContent=(f.ket?f.ket+' \u00b7 ':'')+'Foto '+(fotoIdx+1)+' dari '+a.foto.length+'. Ketuk dua kali foto untuk memperbesar.';
+    lfPanggung.classList.remove('zoom'); lfPanggung.scrollTop=0; lfPanggung.scrollLeft=0;
+  }
+  function bukaFotoAsli(){
+    var f=DATA[aktif]&&DATA[aktif].foto[fotoIdx];
+    if(!f||f.video||typeof f==='string')return;
+    hentiPutar(); tampilFotoAsli();
+    lapisFoto.classList.add('buka'); lapisDibuka('foto');
+  }
+  function tutupFotoAsli(){
+    if(!fotoAsliTerbuka())return;
+    lapisFoto.classList.remove('buka'); lfImg.removeAttribute('src'); lapisDitutup('foto');
+  }
+  function langkahFotoAsli(arah){
+    var a=DATA[aktif]; if(!a||!a.foto)return;
+    var n=a.foto.length, i=fotoIdx;
+    for(var k=0;k<n;k++){
+      i=(i+arah+n)%n; var f=a.foto[i];
+      if(f&&typeof f!=='string'&&!f.video){ fotoIdx=i; gambarFoto(0); tampilFotoAsli(); return; }
+    }
+  }
+  document.getElementById('btnTutupFoto').addEventListener('click',tutupFotoAsli);
+  document.getElementById('btnFotoAsliSebelum').addEventListener('click',function(){langkahFotoAsli(-1)});
+  document.getElementById('btnFotoAsliSesudah').addEventListener('click',function(){langkahFotoAsli(1)});
+  lfImg.addEventListener('dblclick',function(){lfPanggung.classList.toggle('zoom')});
+  document.addEventListener('keydown',function(e){
+    if(!fotoAsliTerbuka())return;
+    if(e.key==='Escape')tutupFotoAsli();
+    else if(e.key==='ArrowLeft')langkahFotoAsli(-1);
+    else if(e.key==='ArrowRight')langkahFotoAsli(1);
+  });
   function langkahFoto(arah){var n=DATA[aktif].foto.length; fotoIdx=(fotoIdx+arah+n)%n; gambarFoto(arah); if(putarFoto)mulaiPutar()}
   function mulaiPutar(){clearInterval(timerFoto); timerFoto=setInterval(function(){
     var f=DATA[aktif]&&DATA[aktif].foto[fotoIdx];
@@ -820,7 +893,7 @@ h1 span{color:#b8860b}
     if(!tumpukanLapis.length&&jebakanAktif){ jebakanAktif=false; abaikanPop=true; try{history.back()}catch(e){} }
     if(!tumpukanLapis.length){ setTimeout(function(){ segarkanAlbum(false); },600); }
   }
-  var tutupBerdasarkanId={detail:tutup, unggah:tutupUpload, edit:tutupEdit};
+  var tutupBerdasarkanId={detail:tutup, unggah:tutupUpload, edit:tutupEdit, foto:tutupFotoAsli};
   window.addEventListener('popstate',function(){
     if(abaikanPop){ abaikanPop=false; return; }
     if(!jebakanAktif)return;
